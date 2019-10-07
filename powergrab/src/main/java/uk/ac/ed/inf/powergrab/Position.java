@@ -5,21 +5,21 @@ public class Position {
 	public double longitude;
 	public Position(double latitude, double longitude) {
 		this.latitude = latitude;
-		this.longitude=longitude;
+		this.longitude = longitude;
 	}
 	
 	// use static to ensure these values are only calculated once.
 	// this can avoid duplicated calculation in every movement.
-	public static final double sin45 = 0.0003*Math.sin(Math.PI/4);
-	public static final double sin225 = 0.0003*Math.sin(Math.PI/8);
-	public static final double cos225 = 0.0003*Math.cos(Math.PI/8);
+	public static final double sin45 = 0.0003 * Math.sin(Math.PI / 4);
+	public static final double sin225 = 0.0003 * Math.sin(Math.PI / 8);
+	public static final double cos225 = 0.0003 * Math.cos(Math.PI / 8);
 	
 	
 	public Position nextPosition(Direction direction) { 
-		// use switch to check which direction it goes and return the final position with the value calculated before
+		// use switch to check which direction it goes and return the final position with the value calculated before.
 		switch (direction) {
 		    case E:
-		    	return (new Position(latitude ,longitude + 0.0003));
+		    	return (new Position(latitude, longitude + 0.0003));
 		    case ENE:
 		    	return (new Position(latitude + sin225, longitude + cos225));
 		    case NE:
@@ -56,9 +56,9 @@ public class Position {
 		
 	}
 	public boolean inPlayArea() {
-		//on the edge is invalid, so no equal in the condition
-		if (latitude>55.942617 && latitude<55.946233 
-				&& longitude>-3.192473 && longitude<-3.184319) {
+		// drone on the edge is invalid, so no equal in the condition.
+		if (latitude > 55.942617 && latitude < 55.946233 
+				&& longitude > -3.192473 && longitude < -3.184319) {
 			return true;
 		}
 		return false;
