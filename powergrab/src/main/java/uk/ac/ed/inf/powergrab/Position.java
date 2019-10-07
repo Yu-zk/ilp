@@ -7,65 +7,53 @@ public class Position {
 		this.latitude = latitude;
 		this.longitude=longitude;
 	}
+	
+	// use static to ensure these values are only calculated once.
+	// this can avoid duplicated calculation in every movement.
+	public static final double sin45 = 0.0003*Math.sin(Math.PI/4);
+	public static final double sin225 = 0.0003*Math.sin(Math.PI/8);
+	public static final double cos225 = 0.0003*Math.cos(Math.PI/8);
+	
+	
 	public Position nextPosition(Direction direction) { 
-		int unit = 0;
-		//each unit is 22.5degree, from East, consider a unit circle
-		//in this way, positive and negative are included in sin and cos function
-		//for example, WSW is 9*22.5=202.5, sin(202.5)=-0.38, cos(202.5)=-0.92
-		//so the change of position is -0.38*0.0003 and -0.92*0.0003 
+		// use switch to check which direction it goes and return the final position with the value calculated before
 		switch (direction) {
 		    case E:
-		    	unit=0;
-		    	break;
+		    	return (new Position(latitude ,longitude + 0.0003));
 		    case ENE:
-		    	unit=1;
-		    	break;
+		    	return (new Position(latitude + sin225, longitude + cos225));
 		    case NE:
-		    	unit=2;
-		    	break;
+		    	return (new Position(latitude + sin45, longitude + sin45));
 		    case NNE:
-		    	unit=3;
-		    	break;
+		    	return (new Position(latitude + cos225, longitude + sin225));
 		    case N:
-		    	unit=4;
-		    	break;
+		    	return (new Position(latitude + 0.0003, longitude));
 		    case NNW:
-		    	unit=5;
-		    	break;
+		    	return (new Position(latitude + cos225, longitude - sin225));
 		    case NW:
-		    	unit=6;
-		    	break;
+		    	return (new Position(latitude + sin45, longitude - sin45));
 		    case WNW:
-		    	unit=7;
-		    	break;
+		    	return (new Position(latitude + sin225, longitude - cos225));
 		    case W:
-		    	unit=8;
-		    	break;
+		    	return (new Position(latitude, longitude - 0.0003));
 		    case WSW:
-		    	unit=9;
-		    	break;
+		    	return (new Position(latitude - sin225, longitude - cos225));
 		    case SW:
-		    	unit=10;
-		    	break;
+		    	return (new Position(latitude - sin45, longitude - sin45));
 		    case SSW:
-		    	unit=11;
-		    	break;
+		    	return (new Position(latitude - cos225, longitude - sin225));
 		    case S:
-		    	unit=12;
-		    	break;
+		    	return (new Position(latitude - 0.0003, longitude));
 		    case SSE:
-		    	unit=13;
-		    	break;
+		    	return (new Position(latitude - cos225, longitude + sin225));
 		    case SE:
-		    	unit=14;
-		    	break;
+		    	return (new Position(latitude - sin45, longitude + sin45));
 		    case ESE:
-		    	unit=15;
-		    	break;
+		    	return (new Position(latitude - sin225, longitude + cos225));
 		    default:
 		    	throw new IllegalArgumentException("Direction does not exist.");
 		}
-		return (new Position(latitude+0.0003*Math.sin(Math.PI/8*unit), longitude+0.0003*Math.cos(Math.PI/8*unit)));
+		
 	}
 	public boolean inPlayArea() {
 		//on the edge is invalid, so no equal in the condition
