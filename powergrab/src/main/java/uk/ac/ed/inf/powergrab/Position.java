@@ -12,7 +12,7 @@ public class Position {
 		//each unit is 22.5degree, from East, consider a unit circle
 		//in this way, positive and negative are included in sin and cos function
 		//for example, WSW is 9*22.5=202.5, sin(202.5)=-0.38, cos(202.5)=-0.92
-		//so the change of position is -0.38*0.0003 and -0.92*0.0003
+		//so the change of position is -0.38*0.0003 and -0.92*0.0003 
 		switch (direction) {
 		    case E:
 		    	unit=0;
