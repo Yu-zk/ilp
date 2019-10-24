@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import com.mapbox.geojson.MultiPoint;
+import com.mapbox.geojson.Point;
+
 public class Stateless {
 	public double latitude;
     public double longitude;
@@ -11,12 +14,16 @@ public class Stateless {
     public double power;
     public ArrayList<Station> stations;
     private java.util.Random rnd;
+    public String out = "";
+    public ArrayList<Point> points = new ArrayList<Point>();
+
 
 	public Stateless(double latitude, double longitude, int seed, ArrayList<Station> stations) {
 		super();
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.stations = stations;
+		points.add(Point.fromLngLat(longitude, latitude));
 		rnd = new Random(seed);
 		coins = 0;
 		power = 250;
@@ -24,10 +31,12 @@ public class Stateless {
 	
 	public boolean next() {
 //		rnd.nextInt(16);
+		setPower(1.25);
 		HashMap<Direction, Station> availableStation = findStations(latitude, longitude);
+		out = out + String.format("%f,%f,", latitude, longitude);
 		Direction nextD;
-		double coins = 0;
-		double power = 0;
+		Position p = new Position(latitude, longitude);
+		String id = "";
 		if (availableStation.size()>0) {
 			double max = 0;
 			Direction maxD = Direction.N;
@@ -35,41 +44,69 @@ public class Stateless {
 				if (availableStation.get(d).power > max) {
 					max = availableStation.get(d).power;
 					maxD = d;
-					coins = availableStation.get(d).coins;
-					power = availableStation.get(d).power;
+					id = availableStation.get(d).id;
 				}
 			}
 			if (max>0) {
 				nextD = maxD;
-				
 			}else {
-				nextD = Direction.values()[rnd.nextInt(16)];
+				nextD = randomDirection(p);
+				if (!(availableStation.size()==16)) {
+					while (availableStation.containsKey(nextD)){
+						nextD = randomDirection(p);
+					}
+				}
 				
 			}
 			
 		}else {
-			nextD = Direction.values()[rnd.nextInt(16)];
+			nextD = randomDirection(p);
 		}
-		Position p = new Position(latitude, longitude);
-		System.out.println(nextD);
+		System.out.print(nextD);
 		p = p.nextPosition(nextD);
 		latitude = p.latitude;
 		longitude = p.longitude;
-		
-		setCoins(coins);
-		setPower(power);
+		out = out + String.format("%s,%f,%f,", nextD, latitude, longitude);
+		for (Station s : stations) {
+			if (s.id==id) {
+				s.update(setCoins(s.coins),setPower(s.power));
+				break;
+			}
+		}
+		out = out + String.format("%f,%f\n", coins, power);
+		points.add(Point.fromLngLat(longitude, latitude));
 		return this.power>0;
 	}
 	
-	private void setCoins(double coins) {
-		this.coins = this.coins + coins;
-		if (this.coins <= 0) {
+	private double setCoins(double coins) {
+		double coinsBefore = this.coins;
+		if (this.coins + coins <= 0) {
 			this.coins =  0;
+			return -coinsBefore;
+		}else {
+			this.coins = this.coins + coins;
+			return -coins;
 		}
+		 
+	}
+	
+	private Direction randomDirection(Position p) {
+		Direction d = Direction.values()[rnd.nextInt(16)];
+		while (!p.nextPosition(d).inPlayArea()) {
+			d = Direction.values()[rnd.nextInt(16)];
+		}
+		return d;
 	}
 
-	private void setPower(double power) {
-		this.power = power;
+	private double setPower(double power) {
+		double powerBefore = this.power;
+		if (this.power - power <= 0) {
+			this.power = 0;
+			return -powerBefore;
+		}else {
+			this.power = this.power + power;
+			return -power;
+		}
 	}
 
 	private HashMap<Direction, Station> findStations(double latitude, double longitude){
@@ -80,16 +117,19 @@ public class Stateless {
 			ArrayList<Station> ss = new ArrayList<Station>();
 			for (Station s : stations) {
 				
-				if (distance(s.latitude, s.longitude, p1.latitude, p1.longitude) <= 0.00025){
+				if ((distance(s.latitude, s.longitude, p1.latitude, p1.longitude) <= 0.00025) && s.coins!=0 && s.power!=0){
 					ss.add(s);
 				}
 			}
-		    if (ss.size()==1) {
-		    	r.put(d, ss.get(0));
-		    }else if(ss.size()>1) {
-		    	//algorithm
-		    	r.put(d, ss.get(0));
-		    }
+			if (p1.inPlayArea()) {
+				if (ss.size()==1) {
+			    	r.put(d, ss.get(0));
+			    }else if(ss.size()>1) {
+			    	//algorithm
+			    	r.put(d, ss.get(0));
+			    }
+			}
+		    
 		}
 			
 		
