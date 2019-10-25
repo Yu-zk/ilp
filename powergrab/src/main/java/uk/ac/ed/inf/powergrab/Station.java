@@ -1,13 +1,16 @@
 package uk.ac.ed.inf.powergrab;
 
 public class Station {
-    public String id;
-    public double coins;
-    public double power;
+	private String id;
+    private double coins;
+    private double power;
     private String symbol;
     private String color;
-    public double latitude;
-    public double longitude;
+    private double latitude;
+    
+
+
+	private double longitude;
 	public Station(String id, double coins, double power, String symbol, String color, double latitude,
 			double longitude) {
 		super();
@@ -22,6 +25,9 @@ public class Station {
 	public void update(double coins, double power) {
 		this.coins = this.coins + coins;
 		this.power = this.power + power;
+		if (this.coins == 0 && this.power == 0) {
+			this.symbol = "zero";
+		}
 	}
 	
 	
@@ -38,6 +44,37 @@ public class Station {
 	public void setColor(String color) {
 		this.color = color;
 	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public double getCoins() {
+		return coins;
+	}
+	public void setCoins(double coins) {
+		this.coins = coins;
+	}
+	public double getPower() {
+		return power;
+	}
+	public void setPower(double power) {
+		this.power = power;
+	}
+	public double getLatitude() {
+		return latitude;
+	}
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+	public double getLongitude() {
+		return longitude;
+	}
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
 	
 
 
