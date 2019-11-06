@@ -145,7 +145,7 @@ public class Stateless {
 			ArrayList<Station> ss = new ArrayList<Station>();
 			for (Station s : stations) {
 				
-				if ((distance(s.getLatitude(), s.getLongitude(), p1.latitude, p1.longitude) <= 0.00025) && s.getSymbol()!="zero"){
+				if ((distance(s.getLatitude(), s.getLongitude(), p1.latitude, p1.longitude) <= 0.00025) ){ //&& s.getSymbol()!="zero"
 					ss.add(s);
 				}
 			}
@@ -153,6 +153,8 @@ public class Stateless {
 				if (ss.size()==1) {
 			    	r.put(d, ss.get(0));
 			    }else if(ss.size()>1) {
+			    	//TODO
+			    	//only choose min, rather than sorting everything
 			    
 			    	Comparator<Station> c=new Comparator<Station>()  {
 

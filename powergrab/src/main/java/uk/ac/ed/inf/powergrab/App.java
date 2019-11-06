@@ -21,16 +21,8 @@ public class App
         int seed = Integer.parseInt(args[5]);
         String mode = args[6];
         
-
         Play p = new Play(day, month, year, latitude, longitude, seed, mode);
-        
-        
-
 
     }
-	
-	
 
-    
-    
 }
