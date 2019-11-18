@@ -9,15 +9,11 @@ import java.util.Random;
 import com.mapbox.geojson.Point;
 
 
-public class Stateless {
-	public double latitude;
-    public double longitude;
-    public double coins;
-    public double power;
-    public ArrayList<Station> stations;
+public class Stateless extends Drone {
+	private ArrayList<Station> stations;
     private java.util.Random rnd;
-    public String out = "";
-    public ArrayList<Point> points = new ArrayList<Point>();
+    private String out = "";
+	private ArrayList<Point> points = new ArrayList<Point>();
 
 	public Stateless(double latitude, double longitude, int seed, ArrayList<Station> stations) {
 		super();
@@ -32,12 +28,12 @@ public class Stateless {
 	
 	public boolean next() {
 		setPower(1.25);
-		HashMap<Direction, Station> availableStation = findStations(latitude, longitude);
 		StringBuilder sb = new StringBuilder();
 		sb.append(latitude);
 		sb.append(",");
 		sb.append(longitude);
 		sb.append(",");
+		HashMap<Direction, Station> availableStation = findStations(latitude, longitude);
 		Direction nextD;
 		Position p = new Position(latitude, longitude);
 		String id = "";
@@ -107,7 +103,6 @@ public class Stateless {
 			this.coins = this.coins + coins;
 			return -coins;
 		}
-		 
 	}
 	
 	private Direction randomDirection(ArrayList<Direction> directions, Position p) {
@@ -126,17 +121,7 @@ public class Stateless {
 		return d;
 	}
 
-	private double setPower(double power) {
-		double powerBefore = this.power;
-		if (this.power - power <= 0) {
-			this.power = 0;
-			return -powerBefore;
-		}else {
-			this.power = this.power + power;
-			return -power;
-		}
-	}
-
+	
 	private HashMap<Direction, Station> findStations(double latitude, double longitude){
 		HashMap<Direction, Station> r = new HashMap<Direction, Station>();
 		Position p = new Position(latitude, longitude);
@@ -144,7 +129,6 @@ public class Stateless {
 			Position p1 = p.nextPosition(d);
 			ArrayList<Station> ss = new ArrayList<Station>();
 			for (Station s : stations) {
-				
 				if ((distance(s.getLatitude(), s.getLongitude(), p1.latitude, p1.longitude) <= 0.00025) ){ //&& s.getSymbol()!="zero"
 					ss.add(s);
 				}
@@ -153,28 +137,35 @@ public class Stateless {
 				if (ss.size()==1) {
 			    	r.put(d, ss.get(0));
 			    }else if(ss.size()>1) {
-			    	//TODO
-			    	//only choose min, rather than sorting everything
-			    
-			    	Comparator<Station> c=new Comparator<Station>()  {
-
-						@Override
-						public int compare(Station o1, Station o2) {
-							double d = (distance(o1.getLatitude(), o1.getLongitude(), p1.latitude, p1.longitude) - 
-									distance(o2.getLatitude(), o2.getLongitude(), p1.latitude, p1.longitude));
-							if (d>0){
-								return 1;
-							}else if(d==0) {
-								return 0;
-										
-							}else {
-								return -1;
-							}
+//			    	find the min
+			    	double minDistance = 1;
+			    	Station minStation = null;
+			    	for (Station s : stations) {
+			    		double d1 = distance(s.getLatitude(), s.getLongitude(), p1.latitude, p1.longitude) ;
+						if (d1<minDistance) {
+							minDistance = d1;
+							minStation = s;
 						}
-					};
-					Collections.sort(ss,c);
-			    	
-			    	r.put(d, ss.get(0));
+			    	}
+			    	r.put(d, minStation);
+			    
+//			    	Comparator<Station> c=new Comparator<Station>()  {
+//
+//						@Override
+//						public int compare(Station o1, Station o2) {
+//							double d = (distance(o1.getLatitude(), o1.getLongitude(), p1.latitude, p1.longitude) - 
+//									distance(o2.getLatitude(), o2.getLongitude(), p1.latitude, p1.longitude));
+//							if (d>0){
+//								return 1;
+//							}else if(d==0) {
+//								return 0;
+//							}else {
+//								return -1;
+//							}
+//						}
+//					};
+//					Collections.sort(ss,c);
+//			    	r.put(d, ss.get(0));
 			    }
 			}
 		}
@@ -187,6 +178,12 @@ public class Stateless {
 	
 	private double distance(Position p1, Position p2) {
 		return Math.sqrt((p2.latitude - p1.latitude)*(p2.latitude - p1.latitude) + (p2.longitude-p1.longitude)*(p2.longitude-p1.longitude));
+	}
+	public String getOut() {
+		return out;
+	}
+	public ArrayList<Point> getPoints() {
+		return points;
 	}
 	
 	

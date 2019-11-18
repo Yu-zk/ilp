@@ -19,28 +19,9 @@ import com.mapbox.geojson.Point;
 
 public class Play {
 	private static FeatureCollection fc;
-	private String day;
-	private String month;
-	private String year;
-	private double latitude;
-	private double longitude;
-	private int seed;
-	private String mode;
-
-	
 	public Play(String day, String month, String year, double latitude, double longitude, int seed, String mode) {
-		super();
-		this.day = day;
-		this.month = month;
-		this.year = year;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.seed = seed;
-		this.mode = mode;
-		
-        ArrayList<Station> stations = buildMap(year, month, day);
-        
-
+//		super();
+		ArrayList<Station> stations = buildMap(year, month, day);
         
         Stateless play = new Stateless(latitude, longitude, seed, stations);
         int j = 0;
@@ -51,11 +32,11 @@ public class Play {
         		
         	}
         }
-        System.out.println(play.out);
-        System.out.println(toJson(play.points));
+        System.out.println(play.getOut());
+        System.out.println(toJson(play.getPoints()));
         
-        wirteFile(String.format("dronetype-%s-%s-%s.txt", day, month, year),play.out);
-        wirteFile(String.format("dronetype-%s-%s-%s.geojson", day, month, year),toJson(play.points));
+        wirteFile(String.format("dronetype-%s-%s-%s.txt", day, month, year),play.getOut());
+        wirteFile(String.format("dronetype-%s-%s-%s.geojson", day, month, year),toJson(play.getPoints()));
 	}
 
 	private static void wirteFile(String fileName, String str)  {
