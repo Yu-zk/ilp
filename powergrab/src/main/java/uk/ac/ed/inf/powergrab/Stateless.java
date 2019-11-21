@@ -1,29 +1,17 @@
 package uk.ac.ed.inf.powergrab;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Random;
-
 import com.mapbox.geojson.Point;
 
 
 public class Stateless extends Drone {
-	private ArrayList<Station> stations;
-    private java.util.Random rnd;
-    private String out = "";
-	private ArrayList<Point> points = new ArrayList<Point>();
-
+	
 	public Stateless(double latitude, double longitude, int seed, ArrayList<Station> stations) {
-		super();
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.stations = stations;
+		super(latitude, longitude, stations, seed);
 		points.add(Point.fromLngLat(longitude, latitude));
-		rnd = new Random(seed);
-		coins = 0;
-		power = 250;
+		
+
 	}
 	
 	public boolean next() {
@@ -179,12 +167,7 @@ public class Stateless extends Drone {
 	private double distance(Position p1, Position p2) {
 		return Math.sqrt((p2.latitude - p1.latitude)*(p2.latitude - p1.latitude) + (p2.longitude-p1.longitude)*(p2.longitude-p1.longitude));
 	}
-	public String getOut() {
-		return out;
-	}
-	public ArrayList<Point> getPoints() {
-		return points;
-	}
+	
 	
 	
 //	if (availableStation.size()>0) {

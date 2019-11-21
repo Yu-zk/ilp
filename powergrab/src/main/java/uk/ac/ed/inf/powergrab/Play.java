@@ -23,17 +23,20 @@ public class Play {
 //		super();
 		ArrayList<Station> stations = buildMap(year, month, day);
         
-        Stateless play = new Stateless(latitude, longitude, seed, stations);
-        int j = 0;
-        while(j < 250 && play.next()) {
-        	j++;
-        	if (j==20) {
-        		System.out.print(1);
-        		
-        	}
-        }
-        System.out.println(play.getOut());
-        System.out.println(toJson(play.getPoints()));
+//        Stateless play = new Stateless(latitude, longitude, seed, stations);
+//        int j = 0;
+//        while(j < 250 && play.next()) {
+//        	j++;
+//        	if (j==20) {
+//        		System.out.print(1);
+//        	}
+//        }
+//        System.out.println(play.getOut());
+//        System.out.println(toJson(play.getPoints()));
+        
+        
+		Stateful play = new Stateful(latitude, longitude, seed, stations);
+		play.p();
         
         wirteFile(String.format("dronetype-%s-%s-%s.txt", day, month, year),play.getOut());
         wirteFile(String.format("dronetype-%s-%s-%s.geojson", day, month, year),toJson(play.getPoints()));
