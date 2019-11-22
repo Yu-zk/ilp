@@ -7,9 +7,6 @@ public class Station {
     private String symbol;
     private String color;
     private double latitude;
-    
-
-
 	private double longitude;
 	public Station(String id, double coins, double power, String symbol, String color, double latitude,
 			double longitude) {
@@ -29,9 +26,14 @@ public class Station {
 			this.symbol = "zero";
 		}
 	}
+	public double distance(Position p) {
+		return Math.sqrt((latitude-p.latitude)*(latitude-p.latitude) + (longitude-p.longitude)*(longitude-p.longitude));
+	}
 	
 	
-	
+	public Position getPosition() {
+		return new Position(latitude, longitude);
+	}
 	public String getSymbol() {
 		return symbol;
 	}

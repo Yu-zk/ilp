@@ -13,17 +13,24 @@ public class Stateless extends Drone {
 		
 
 	}
+	public void run() {
+        while(step < 250 && next()) {
+        	step++;
+        }
+	}
 	
-	public boolean next() {
-		setPower(1.25);
+	private boolean next() {
+		if (setPower(-1.25)!=1.25) {
+			return false;
+		}
+
 		StringBuilder sb = new StringBuilder();
-		sb.append(latitude);
+		sb.append(currentPosition.latitude);
 		sb.append(",");
-		sb.append(longitude);
+		sb.append(currentPosition.longitude);
 		sb.append(",");
-		HashMap<Direction, Station> availableStation = findStations(latitude, longitude);
+		HashMap<Direction, Station> availableStation = findStations(currentPosition);
 		Direction nextD;
-		Position p = new Position(latitude, longitude);
 		String id = "";
 		if (availableStation.size()>0) {
 			ArrayList<Direction> lighthouse = new ArrayList<Direction>();
@@ -44,26 +51,26 @@ public class Stateless extends Drone {
 				
 			}
 			if (lighthouse.size()>0) {
-				nextD = randomDirection(lighthouse, p);
+				nextD = randomDirection(lighthouse, currentPosition);
 			}else if (zero.size()>0) {
-				nextD = randomDirection(zero, p);
+				nextD = randomDirection(zero, currentPosition);
 			}else {
-				nextD = randomDirection(danger, p);
+				nextD = randomDirection(danger, currentPosition);
 			}
 			if (availableStation.containsKey(nextD)) {
 				id = availableStation.get(nextD).getId();
 			}
 		}else {
-			nextD = randomDirection(p);
+			nextD = randomDirection(currentPosition);
 		}
-		p = p.nextPosition(nextD);
-		latitude = p.latitude;
-		longitude = p.longitude;
+		
+		currentPosition = currentPosition.nextPosition(nextD);
+
 		sb.append(nextD);
 		sb.append(",");
-		sb.append(latitude);
+		sb.append(currentPosition.latitude);
 		sb.append(",");
-		sb.append(longitude);
+		sb.append(currentPosition.longitude);
 		sb.append(",");
 		for (Station s : stations) {
 			if (s.getId()==id) {
@@ -78,20 +85,11 @@ public class Stateless extends Drone {
 		out = out + sb.toString();
 		System.out.print(sb);
 
-		points.add(Point.fromLngLat(longitude, latitude));
+		points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
 		return this.power>0;
 	}
 	
-	private double setCoins(double coins) {
-		double coinsBefore = this.coins;
-		if (this.coins + coins <= 0) {
-			this.coins =  0;
-			return -coinsBefore;
-		}else {
-			this.coins = this.coins + coins;
-			return -coins;
-		}
-	}
+	
 	
 	private Direction randomDirection(ArrayList<Direction> directions, Position p) {
 		Direction d = directions.get(rnd.nextInt(directions.size()));
@@ -110,14 +108,14 @@ public class Stateless extends Drone {
 	}
 
 	
-	private HashMap<Direction, Station> findStations(double latitude, double longitude){
+	private HashMap<Direction, Station> findStations(Position p){
 		HashMap<Direction, Station> r = new HashMap<Direction, Station>();
-		Position p = new Position(latitude, longitude);
 		for (Direction d : Direction.values()) {
 			Position p1 = p.nextPosition(d);
 			ArrayList<Station> ss = new ArrayList<Station>();
 			for (Station s : stations) {
-				if ((distance(s.getLatitude(), s.getLongitude(), p1.latitude, p1.longitude) <= 0.00025) ){ //&& s.getSymbol()!="zero"
+//				distance(s.getLatitude(), s.getLongitude(), p1.latitude, p1.longitude)
+				if ((s.distance(p1) <= 0.00025) ){ //&& s.getSymbol()!="zero"
 					ss.add(s);
 				}
 			}
@@ -129,7 +127,8 @@ public class Stateless extends Drone {
 			    	double minDistance = 1;
 			    	Station minStation = null;
 			    	for (Station s : stations) {
-			    		double d1 = distance(s.getLatitude(), s.getLongitude(), p1.latitude, p1.longitude) ;
+			    		double d1 = s.distance(p1);
+//			    		distance(s.getLatitude(), s.getLongitude(), p1.latitude, p1.longitude) ;
 						if (d1<minDistance) {
 							minDistance = d1;
 							minStation = s;
