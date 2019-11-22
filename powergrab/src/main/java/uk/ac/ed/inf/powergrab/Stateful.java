@@ -52,7 +52,7 @@ public class Stateful extends Drone{
 			}
 			return false;
 		}else {
-			boolean arrived = inRange(target);
+			boolean arrived = false;  //   inRange(target);
 //			TODO start with green
 //			if (arrived) {
 //				if (setPower(-1.25)!=1.25|| step>=250) {
