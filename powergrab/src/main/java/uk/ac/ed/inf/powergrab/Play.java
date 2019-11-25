@@ -22,20 +22,31 @@ public class Play {
 	public Play(String day, String month, String year, double latitude, double longitude, int seed, String mode) {
 //		super();
 		ArrayList<Station> stations = buildMap(year, month, day);
-		Stateful play = new Stateful(latitude, longitude, seed, stations);
-//        Stateless play = new Stateless(latitude, longitude, seed, stations);
+		if ("stateful".equals(mode)) {
+			Stateful play = new Stateful(latitude, longitude, seed, stations);
+			play.run();
+			wirteFile(String.format("dronetype-%s-%s-%s.txt", day, month, year),play.getOut());
+			wirteFile(String.format("dronetype-%s-%s-%s.geojson", day, month, year),toJson(play.getPoints()));
+//	        System.out.println(play.getOut());
+		}else {
+			Stateless play = new Stateless(latitude, longitude, seed, stations);
+			play.run();
+			wirteFile(String.format("dronetype-%s-%s-%s.txt", day, month, year),play.getOut());
+			wirteFile(String.format("dronetype-%s-%s-%s.geojson", day, month, year),toJson(play.getPoints()));
+//	        System.out.println(play.getOut());
+		}
+        
 		//insure stations is not null
 		
 
-        play.run();
-//        System.out.println(play.getOut());
+		
 //        System.out.println(toJson(play.getPoints()));
         
 
         
-        wirteFile(String.format("dronetype-%s-%s-%s.txt", day, month, year),play.getOut());
+        
 //        System.out.println(play.getPoints().size());
-        wirteFile(String.format("dronetype-%s-%s-%s.geojson", day, month, year),toJson(play.getPoints()));
+        
 	}
 
 	private static void wirteFile(String fileName, String str)  {

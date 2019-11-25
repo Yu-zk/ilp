@@ -83,7 +83,7 @@ public class Stateless extends Drone {
 		sb.append(power);
 		sb.append("\n");
 		out = out + sb.toString();
-		System.out.print(sb);
+//		System.out.print(sb);
 
 		points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
 		return this.power>0;

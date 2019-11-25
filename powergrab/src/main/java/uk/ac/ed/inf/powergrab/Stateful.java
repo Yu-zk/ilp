@@ -47,7 +47,7 @@ public class Stateful extends Drone{
 				sb.append(coins);sb.append(",");
 				sb.append(power);sb.append("\n");
 				points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
-				System.out.print(sb);
+//				System.out.print(sb);
 				out = out + sb.toString();
 			}
 			return false;
@@ -107,7 +107,7 @@ public class Stateful extends Drone{
 					sb.append(power);sb.append("\n");
 					points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
 				}
-				System.out.print(sb);
+//				System.out.print(sb);
 				out = out + sb.toString();
 //			}
 		}
