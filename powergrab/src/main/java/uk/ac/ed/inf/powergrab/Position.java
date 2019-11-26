@@ -63,4 +63,11 @@ public class Position {
 		}
 		return false;
 	}
+	
+	public boolean equals(Position p) {
+		// TODO Auto-generated method stub
+		return p.latitude==latitude && p.longitude==longitude;
+	}
+	
+	
 }

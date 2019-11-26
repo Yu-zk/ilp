@@ -1,15 +1,16 @@
 package uk.ac.ed.inf.powergrab;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import com.mapbox.geojson.Point;
 
 public class Stateful extends Drone{
-	//	https://zhuanlan.zhihu.com/p/29390935
-	//	https://blog.csdn.net/google19890102/article/details/45395257
-	//1	https://blog.csdn.net/sinat_30046339/article/details/50918045
+
 	private Direction nextD=Direction.N;
+	private Direction[] directionList= new Direction[4];
 
 	public Stateful(double latitude, double longitude, int seed, ArrayList<Station> stations) {
 		super(latitude, longitude, stations, seed);
@@ -18,17 +19,21 @@ public class Stateful extends Drone{
 
 	}
 	public void run() {
-		while(step < 250 && next()) {
+		while(step < 250 && next(new ArrayList<String>())) {
 			step++;
 		}
+		System.out.printf("%f %f\n",coins,power);
 	}
-	private boolean next() {
+	private boolean next(List<String> id) {
 
 		double min = 1;
 		Station target= null;
+
 		for (Station s: stations) {
 			double d=s.distance(currentPosition);
-			if (("lighthouse".equals(s.getSymbol())) && d<min) {
+
+			id.contains(s.getId());
+			if ((!id.contains(s.getId()))&&("lighthouse".equals(s.getSymbol())) && d<min) {
 				min = d;
 				target = s;
 			}
@@ -39,7 +44,7 @@ public class Stateful extends Drone{
 				sb.append(currentPosition.latitude);sb.append(",");
 				sb.append(currentPosition.longitude);sb.append(",");	
 				step ++;
-				nextD = oppoiste(nextD);
+				nextD = opposite(nextD);
 				currentPosition=currentPosition.nextPosition(nextD);
 				sb.append(nextD);sb.append(",");
 				sb.append(currentPosition.latitude);sb.append(",");
@@ -47,69 +52,66 @@ public class Stateful extends Drone{
 				sb.append(coins);sb.append(",");
 				sb.append(power);sb.append("\n");
 				points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
-//				System.out.print(sb);
+				//				System.out.print(sb);
 				out = out + sb.toString();
 			}
 			return false;
 		}else {
 			boolean arrived = false;  //   inRange(target);
-//			TODO start with green
-//			if (arrived) {
-//				if (setPower(-1.25)!=1.25|| step>=250) {
-//					return false;
-//				}
-//				StringBuilder sb = new StringBuilder(); 
-//				sb.append(currentPosition.latitude);sb.append(",");
-//				sb.append(currentPosition.longitude);sb.append(",");	
-//				step ++;
-//				Direction nextD = nextDirection(target);
-//				currentPosition=currentPosition.nextPosition(nextD);
-//				sb.append(nextD);sb.append(",");
-//				sb.append(currentPosition.latitude);sb.append(",");
-//				sb.append(currentPosition.longitude);sb.append(",");
-//				// can save the index before
-//				for (Station s : stations) {
-//					if (s.getId()==target.getId()) {
-//						s.update(setCoins(s.getCoins()),setPower(s.getPower()));
-//						break;
-//					}
-//				}
-//				sb.append(coins);sb.append(",");
-//				sb.append(power);sb.append("\n");
-//				points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
-//				System.out.print(sb);
-//				out = out + sb.toString();
-//			}else{
-				StringBuilder sb = new StringBuilder(); 
-				while (step < 250 && !arrived) {
-					if (setPower(-1.25)!=1.25|| step>=250) {
-						return false;
-					}
-					sb.append(currentPosition.latitude);sb.append(",");
-					sb.append(currentPosition.longitude);sb.append(",");	
-					step ++;
-					nextD = nextDirection(target);
-					currentPosition=currentPosition.nextPosition(nextD);
-					sb.append(nextD);sb.append(",");
-					sb.append(currentPosition.latitude);sb.append(",");
-					sb.append(currentPosition.longitude);sb.append(",");
-					// can save the index before
-					arrived = inRange(target);
-					if (arrived) {
-						for (Station s : stations) {
-							if (s.getId()==target.getId()) {
-								s.update(setCoins(s.getCoins()),setPower(s.getPower()));
-								break;
-							}
+			//			TODO start with green
+
+			StringBuilder sb = new StringBuilder(); 
+			int times=0;
+
+			while (step < 250 && !arrived&&times<31) {
+				if (setPower(-1.25)!=1.25|| step>=250) {
+					return false;
+				}
+				times++;
+				sb.append(currentPosition.latitude);sb.append(",");
+				sb.append(currentPosition.longitude);sb.append(",");	
+				step ++;
+				nextD = nextDirection(target);
+
+				directionList[3]=directionList[2];
+				directionList[2]=directionList[1];
+				directionList[1]=directionList[0];
+				directionList[0]=nextD;
+				if (directionList[0]==opposite(directionList[3])) {//&&directionList[0]==directionList[2]  20-06-2019
+					nextD=otherDirection(nextD);
+					directionList[0]=nextD;
+				}
+				System.out.println(target.getId());
+				System.out.println(step);
+				if (step==219) {
+					//						step=1000000;
+					System.out.print(1);
+				}
+				currentPosition=currentPosition.nextPosition(nextD);
+				sb.append(nextD);sb.append(",");
+				sb.append(currentPosition.latitude);sb.append(",");
+				sb.append(currentPosition.longitude);sb.append(",");
+				// can save the index before
+				arrived = inRange(target);
+				if (arrived) {
+					for (Station s : stations) {
+						if (s.getId()==target.getId()) {
+							s.update(setCoins(s.getCoins()),setPower(s.getPower()));
+							break;
 						}
 					}
-					sb.append(coins);sb.append(",");
-					sb.append(power);sb.append("\n");
-					points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
 				}
-//				System.out.print(sb);
-				out = out + sb.toString();
-//			}
+				sb.append(coins);sb.append(",");
+				sb.append(power);sb.append("\n");
+
+				points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
+			}
+			if(times==31) {
+				id.add(target.getId());
+				next(id);
+			}
+//							System.out.print(sb);
+			out = out + sb.toString();
 		}
 
 		return this.power>0;
@@ -119,7 +121,6 @@ public class Stateful extends Drone{
 	private Direction nextDirection(Station s) {
 		double min = 1;
 		Direction nextD = null;
-
 		Direction nextDWithNeg = null;
 		for (Direction d : Direction.values()) {
 			Position nextPosition = currentPosition.nextPosition(d);
@@ -153,6 +154,13 @@ public class Stateful extends Drone{
 		return "danger".equals(nearestStation.getSymbol());
 	}
 
+	private Direction otherDirection(Direction d) {
+		Direction nextD = Direction.values()[rnd.nextInt(16)];//||d==nextD
+		while ((!currentPosition.nextPosition(nextD).inPlayArea()) || isHarful(currentPosition.nextPosition(nextD))) {
+			nextD = Direction.values()[rnd.nextInt(16)];
+		}
+		return nextD;
+	}
 	private boolean inRange(Station tragetStation) {
 		if (tragetStation.distance(currentPosition)>0.00025) {return false;}
 		double d = tragetStation.distance(currentPosition);
@@ -163,7 +171,10 @@ public class Stateful extends Drone{
 		}
 		return true;
 	}
-	private Direction oppoiste(Direction d) {
+	private Direction opposite(Direction d) {
+		if (d==null) {
+			return null;
+		}
 		switch (d) {
 		case E:
 			return (Direction.W);

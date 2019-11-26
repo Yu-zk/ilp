@@ -22,30 +22,43 @@ public class Play {
 	public Play(String day, String month, String year, double latitude, double longitude, int seed, String mode) {
 //		super();
 		ArrayList<Station> stations = buildMap(year, month, day);
+		System.out.printf("%s %s %s\n",year,month,day);
 		if ("stateful".equals(mode)) {
 			Stateful play = new Stateful(latitude, longitude, seed, stations);
 			play.run();
-			wirteFile(String.format("dronetype-%s-%s-%s.txt", day, month, year),play.getOut());
-			wirteFile(String.format("dronetype-%s-%s-%s.geojson", day, month, year),toJson(play.getPoints()));
+			wirteFile(String.format("stateful-%s-%s-%s.txt", day, month, year),play.getOut());
+			wirteFile(String.format("stateful-%s-%s-%s.geojson", day, month, year),toJson(play.getPoints()));
 //	        System.out.println(play.getOut());
 		}else {
 			Stateless play = new Stateless(latitude, longitude, seed, stations);
 			play.run();
-			wirteFile(String.format("dronetype-%s-%s-%s.txt", day, month, year),play.getOut());
-			wirteFile(String.format("dronetype-%s-%s-%s.geojson", day, month, year),toJson(play.getPoints()));
+			wirteFile(String.format("stateless-%s-%s-%s.txt", day, month, year),play.getOut());
+			wirteFile(String.format("stateless-%s-%s-%s.geojson", day, month, year),toJson(play.getPoints()));
 //	        System.out.println(play.getOut());
 		}
-        
+//        for (Station s:stations) {
+//        	if ("lighthouse".equals(s.getSymbol())){
+//        		System.out.printf("{%f,%f},",s.getLatitude(),s.getLongitude());
+//        	}
+//        	
+//        }
+//        ArrayList<Point> p=new ArrayList<Point> ();
+//        double[][] l= {{5.5945293E7, -3191184.0},{5.5945277E7, -3192462.0},{5.5944531E7, -3191633.0},{5.5944497E7, -3191544.0},{5.5944048E7, -3191716.0},{5.5943905E7, -3191433.0},{5.5943753E7, -3191248.0},{5.594402E7, -3190458.0},{5.594273E7, -3191075.0},{5.5942662E7, -3189862.0},{5.5944216E7, -3186672.0},{5.5945177E7, -3185937.0},{5.5945009E7, -3185952.0},{5.5943819E7, -3185592.0},{5.5943868E7, -3186409.0},{5.5942645E7, -3186997.0},{5.5942942E7, -3185567.0},{5.5943925E7, -3184608.0},{5.5945066E7, -3184791.0},{5.5945817E7, -3184383.0},{5.5945487E7, -3185865.0},{5.5945753E7, -3187607.0},{5.594562E7, -3188837.0},{5.5945696E7, -3189096.0},{5.5945252E7, -3190341.0},{5.5944654E7, -3190303.0},{5.5944685E7, -3189689.0},{5.5944543E7, -3190036.0},{5.5943412E7, -3189071.0},{5.5944018E7, -3188127.0},{5.594503E7, -3187153.0}};
+//        for (double[] i :l) {
+//    		i[0]=i[0]/1000000;
+//    		i[1]=i[1]/1000000;
+//        }
+//        for (double[] i :l) {
+//        	p.add(Point.fromLngLat(i[1], i[0]));
+//        }
+//
+//        wirteFile(String.format("dronetype-%s-%s-%s.geojson", day, month, year),toJson(p));
 		//insure stations is not null
 		
 
 		
 //        System.out.println(toJson(play.getPoints()));
-        
 
-        
-        
-//        System.out.println(play.getPoints().size());
         
 	}
 
