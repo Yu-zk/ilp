@@ -64,11 +64,15 @@ public class Position {
 		return false;
 	}
 	
-	public boolean equals(Position p) {
-		return p.latitude==latitude && p.longitude==longitude;
-	}
+//	public boolean equals(Position p) {
+//		return p.latitude==latitude && p.longitude==longitude;
+//	}
 	public double distance(Position p) {
 		return Math.sqrt((latitude-p.latitude)*(latitude-p.latitude) + (longitude-p.longitude)*(longitude-p.longitude));
+	}
+	@Override
+	public String toString() {
+		return "Position (" + latitude + ", " + longitude + ")";
 	}
 	
 	

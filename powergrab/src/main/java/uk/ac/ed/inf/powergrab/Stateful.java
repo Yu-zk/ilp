@@ -110,7 +110,7 @@ public class Stateful extends Drone{
 				id.add(target.getId());
 				next(id);
 			}
-//							System.out.print(sb);
+			//							System.out.print(sb);
 			out = out + sb.toString();
 		}
 
@@ -226,11 +226,11 @@ public class Stateful extends Drone{
 	//		}
 	////		points.addAll(SimulatedAnnealing.run(stations));
 	//	}
-private double h(Position p, Position goal) {
-		
+	private double h(Position p, Position goal) {
+
 		return Math.sqrt((p.longitude-goal.longitude)*(p.longitude-goal.longitude) + 
 				(p.latitude-goal.latitude)*(p.latitude-goal.latitude));
-		
+
 	}
 	private ArrayList<Direction> availableDirection(Position s) {
 		ArrayList<Direction> availableDirection = new ArrayList<Direction>();
@@ -241,20 +241,38 @@ private double h(Position p, Position goal) {
 		}
 		return availableDirection;
 	}
+	
+	private void path(HashMap<Position, Position> cameFrom,Position current) {
+		System.out.print(current);
+		while (cameFrom.keySet().contains(current)) {
+			current=cameFrom.get(current);
+			System.out.print(current);
+		}
+	}
+//	private boolean inRange(Position p1,Position p2) {
+//		if (p1.distance(p2)>0.00025) {return false;}
+//		double d = p1.distance(p2);
+//		for (Station s : stations) {
+//			if (p1.distance(p2)<d) {
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
 
 
-	private void astar(Position start, Position goal) {
+	public void astar(Position start, Position goal) {
 		ArrayList<Position> openSet = new ArrayList<Position>();
 		openSet.add(start);
-		
+
 		HashMap<Position, Position> cameFrom = new HashMap<Position, Position>();
-		
+
 		HashMap<Position, Double> gScore = new HashMap<Position, Double>();
 		gScore.put(start, 0.0);
-		
+
 		HashMap<Position, Double> fScore = new HashMap<Position, Double>();
 		fScore.put(start, h(start,goal));
-		
+
 		while (openSet.size()>0) {
 			Position current = null;
 			double min=100;
@@ -264,29 +282,30 @@ private double h(Position p, Position goal) {
 					min=fScore.get(p);
 				}
 			}
-			if (goal.equals(current)) {
-//				reconstruct_path(cameFrom, current)
+			if (goal.distance(current)<0.00025) {
+				//reconstruct_path(cameFrom, current)
+				path(cameFrom,current);
 				return;
 			}
 			//TODO
 			openSet.remove(current);
-//			for each neighbor of current
+			//			for each neighbor of current
 			for (Direction d : availableDirection(current)) {
 				Position neighbor = current.nextPosition(d);
 				double tentative_gScore=gScore.get(current)+0.0003;
 				if (!gScore.containsKey(neighbor)||tentative_gScore<gScore.get(neighbor)) {
 					cameFrom.put(neighbor, current);
 
-			        gScore.put(neighbor, tentative_gScore);
-			        fScore.put(neighbor, gScore.get(neighbor)+h(neighbor,goal));
+					gScore.put(neighbor, tentative_gScore);
+					fScore.put(neighbor, gScore.get(neighbor)+h(neighbor,goal));
 
-			        if(!openSet.contains(neighbor)){
-			        	openSet.add(neighbor);
-			        }
+					if(!openSet.contains(neighbor)){
+						openSet.add(neighbor);
+					}
 				}
 			}
 
-			
+
 		}
 	}
 

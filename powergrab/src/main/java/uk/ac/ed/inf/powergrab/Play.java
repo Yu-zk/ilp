@@ -25,7 +25,8 @@ public class Play {
 		System.out.printf("%s %s %s\n",year,month,day);
 		if ("stateful".equals(mode)) {
 			Stateful play = new Stateful(latitude, longitude, seed, stations);
-			play.run();
+//			play.run();
+			play.astar(new Position(55.9460,-3.1866), new Position(55.9446,-3.1877));
 			wirteFile(String.format("stateful-%s-%s-%s.txt", day, month, year),play.getOut());
 			wirteFile(String.format("stateful-%s-%s-%s.geojson", day, month, year),toJson(play.getPoints()));
 //	        System.out.println(play.getOut());

@@ -17,41 +17,41 @@ public class Astar {
 				(p.latitude-goal.latitude)*(p.latitude-goal.latitude));
 		
 	}
-	private Direction nextDirection(Station s,Position currentPosition) {
-		double min = 1;
-		Direction nextD = null;
-		Direction nextDWithNeg = null;
-		for (Direction d : Direction.values()) {
-			Position nextPosition = currentPosition.nextPosition(d);
-			double distance = s.distance(nextPosition);
-			if (distance < min && nextPosition.inPlayArea()) {
-				nextDWithNeg = d;
-				if (!isHarful(nextPosition)) {
-					min = distance;
-					nextD = d;
-				}
-			}
-		}
-		if (nextD==null) {
-			return nextDWithNeg;
-		}
-		return nextD;
-	}
-	private boolean isHarful(Position p) {
-		double min = 0.00025;
-		Station nearestStation= null;
-		for (Station s: stations) {
-			double d=s.distance(p);
-			if (d<min) {
-				min = d;
-				nearestStation = s;
-			}
-		}
-		if (nearestStation==null) {
-			return false;
-		}
-		return "danger".equals(nearestStation.getSymbol());
-	}
+//	private Direction nextDirection(Station s,Position currentPosition) {
+//		double min = 1;
+//		Direction nextD = null;
+//		Direction nextDWithNeg = null;
+//		for (Direction d : Direction.values()) {
+//			Position nextPosition = currentPosition.nextPosition(d);
+//			double distance = s.distance(nextPosition);
+//			if (distance < min && nextPosition.inPlayArea()) {
+//				nextDWithNeg = d;
+//				if (!isHarful(nextPosition)) {
+//					min = distance;
+//					nextD = d;
+//				}
+//			}
+//		}
+//		if (nextD==null) {
+//			return nextDWithNeg;
+//		}
+//		return nextD;
+//	}
+//	private boolean isHarful(Position p) {
+//		double min = 0.00025;
+//		Station nearestStation= null;
+//		for (Station s: stations) {
+//			double d=s.distance(p);
+//			if (d<min) {
+//				min = d;
+//				nearestStation = s;
+//			}
+//		}
+//		if (nearestStation==null) {
+//			return false;
+//		}
+//		return "danger".equals(nearestStation.getSymbol());
+//	}
 	private void astar(Position start, Position goal) {
 		ArrayList<Position> openSet = new ArrayList<Position>();
 		openSet.add(start);
@@ -80,9 +80,9 @@ public class Astar {
 			
 			openSet.remove(current);
 //			for each neighbor of current
-			for (Position p : neighbour(current)) {
-				
-			}
+//			for (Position p : neighbour(current)) {
+//				
+//			}
 //            // d(current,neighbor) is the weight of the edge from current to neighbor
 //            // tentative_gScore is the distance from start to the neighbor through current
 //            tentative_gScore := gScore[current] + d(current, neighbor)
