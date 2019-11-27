@@ -65,9 +65,12 @@ public class Position {
 	}
 	
 	public boolean equals(Position p) {
-		// TODO Auto-generated method stub
 		return p.latitude==latitude && p.longitude==longitude;
 	}
+	public double distance(Position p) {
+		return Math.sqrt((latitude-p.latitude)*(latitude-p.latitude) + (longitude-p.longitude)*(longitude-p.longitude));
+	}
+	
 	
 	
 }

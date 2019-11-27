@@ -226,5 +226,68 @@ public class Stateful extends Drone{
 	//		}
 	////		points.addAll(SimulatedAnnealing.run(stations));
 	//	}
+private double h(Position p, Position goal) {
+		
+		return Math.sqrt((p.longitude-goal.longitude)*(p.longitude-goal.longitude) + 
+				(p.latitude-goal.latitude)*(p.latitude-goal.latitude));
+		
+	}
+	private ArrayList<Direction> availableDirection(Position s) {
+		ArrayList<Direction> availableDirection = new ArrayList<Direction>();
+		for (Direction d : Direction.values()) {
+			if (!isHarful(s.nextPosition(d))) {
+				availableDirection.add(d);
+			}
+		}
+		return availableDirection;
+	}
+
+
+	private void astar(Position start, Position goal) {
+		ArrayList<Position> openSet = new ArrayList<Position>();
+		openSet.add(start);
+		
+		HashMap<Position, Position> cameFrom = new HashMap<Position, Position>();
+		
+		HashMap<Position, Double> gScore = new HashMap<Position, Double>();
+		gScore.put(start, 0.0);
+		
+		HashMap<Position, Double> fScore = new HashMap<Position, Double>();
+		fScore.put(start, h(start,goal));
+		
+		while (openSet.size()>0) {
+			Position current = null;
+			double min=100;
+			for (Position p:fScore.keySet()) {
+				if (fScore.get(p)<min) {
+					current=p;
+					min=fScore.get(p);
+				}
+			}
+			if (goal.equals(current)) {
+//				reconstruct_path(cameFrom, current)
+				return;
+			}
+			//TODO
+			openSet.remove(current);
+//			for each neighbor of current
+			for (Direction d : availableDirection(current)) {
+				Position neighbor = current.nextPosition(d);
+				double tentative_gScore=gScore.get(current)+0.0003;
+				if (!gScore.containsKey(neighbor)||tentative_gScore<gScore.get(neighbor)) {
+					cameFrom.put(neighbor, current);
+
+			        gScore.put(neighbor, tentative_gScore);
+			        fScore.put(neighbor, gScore.get(neighbor)+h(neighbor,goal));
+
+			        if(!openSet.contains(neighbor)){
+			        	openSet.add(neighbor);
+			        }
+				}
+			}
+
+			
+		}
+	}
 
 }
