@@ -24,9 +24,10 @@ public class Play {
 		ArrayList<Station> stations = buildMap(year, month, day);
 		System.out.printf("%s %s %s\n",year,month,day);
 		if ("stateful".equals(mode)) {
+//			StatefulOld play = new StatefulOld(latitude, longitude, seed, stations);
 			Stateful play = new Stateful(latitude, longitude, seed, stations);
-//			play.run();
-			play.astar(new Position(55.9460,-3.1866), new Position(55.9446,-3.1877));
+			play.run();
+//			play.astar(new Position(55.9460,-3.1866), new Position(55.9430,-3.1886),"12");
 			wirteFile(String.format("stateful-%s-%s-%s.txt", day, month, year),play.getOut());
 			wirteFile(String.format("stateful-%s-%s-%s.geojson", day, month, year),toJson(play.getPoints()));
 //	        System.out.println(play.getOut());

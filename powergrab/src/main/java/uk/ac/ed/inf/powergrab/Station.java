@@ -29,7 +29,9 @@ public class Station {
 	public double distance(Position p) {
 		return Math.sqrt((latitude-p.latitude)*(latitude-p.latitude) + (longitude-p.longitude)*(longitude-p.longitude));
 	}
-	
+	public Position toPosition() {
+		return new Position(latitude, longitude);
+	}
 	
 	public Position getPosition() {
 		return new Position(latitude, longitude);
