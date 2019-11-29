@@ -4,11 +4,11 @@ public class Station {
 	private String id;
     private double coins;
     private double power;
-    private String symbol;
+    private Symbol symbol;
     private String color;
     private double latitude;
 	private double longitude;
-	public Station(String id, double coins, double power, String symbol, String color, double latitude,
+	public Station(String id, double coins, double power, Symbol symbol, String color, double latitude,
 			double longitude) {
 		super();
 		this.id = id;
@@ -23,7 +23,7 @@ public class Station {
 		this.coins = this.coins + coins;
 		this.power = this.power + power;
 		if (this.coins == 0 && this.power == 0) {
-			this.symbol = "zero";
+			this.symbol = Symbol.zero;
 		}
 	}
 	public double distance(Position p) {
@@ -36,10 +36,10 @@ public class Station {
 	public Position getPosition() {
 		return new Position(latitude, longitude);
 	}
-	public String getSymbol() {
+	public Symbol getSymbol() {
 		return symbol;
 	}
-	public void setSymbol(String symbol) {
+	public void setSymbol(Symbol symbol) {
 		this.symbol = symbol;
 	}
 	public String getColor() {

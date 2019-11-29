@@ -29,7 +29,7 @@ public class Stateful extends Drone{
 		for (Station s: stations) {
 			double d=s.distance(currentPosition);
 
-			if ("lighthouse".equals(s.getSymbol()) && d<min) {
+			if (Symbol.lighthouse==(s.getSymbol()) && d<min) {
 				min = d;
 				target = s;
 			}
@@ -165,16 +165,9 @@ public class Stateful extends Drone{
 		if (nearestStation==null) {
 			return false;
 		}
-		return "danger".equals(nearestStation.getSymbol());
+		return Symbol.danger==nearestStation.getSymbol();
 	}
 
-	private Direction otherDirection(Direction d) {
-		Direction nextD = Direction.values()[rnd.nextInt(16)];//||d==nextD
-		while ((!currentPosition.nextPosition(nextD).inPlayArea()) || isHarmful(currentPosition.nextPosition(nextD))) {
-			nextD = Direction.values()[rnd.nextInt(16)];
-		}
-		return nextD;
-	}
 	private boolean inRange(Station targetStation, Position p) {
 		if (targetStation.distance(p)>0.00025) {return false;}
 		double d = targetStation.distance(p);
@@ -300,11 +293,11 @@ public class Stateful extends Drone{
 	}
 	private boolean arrive(Position current, Station target) {
 		if (target.distance(current)>=0.00025) {return false;}
-		for (Station s : stations) {
-			if (s.distance(current)<0.00025&&!s.equals(target)) {
-				return false;
-			}
-		}
+//		for (Station s : stations) {
+//			if (s.distance(current)<0.00025&&!s.equals(target)) {
+//				return false;
+//			}
+//		}
 		return true;
 	}
 
@@ -326,19 +319,20 @@ public class Stateful extends Drone{
 
 		while (openSet.size()>0) {
 
-			if (openSet.size()>60000) {
-				target.setSymbol("blackwhole");
-				System.out.print(openSet.size());
-				return;
-			}
+//			if (openSet.size()>60000) {
+//				target.setSymbol(Symbol.blackwhole);
+//				System.out.print(openSet.size());
+//				return;
+//			}
 			Position current = null;
 			double min=100;
 			for (Position p:openSet) {
-				if (fScore.get(p)<min && fScore.get(p)<10+target.distance(start)) {
+				if (fScore.get(p)<min && fScore.get(p)<0.01+target.distance(start)) {
 					current=p;
 					min=fScore.get(p);
 				}
 			}
+			if (min==100) {continue;}
 
 //			if (goal.distance(current)<0.00025) {//in range
 			if (arrive(current,target)) {//in range
@@ -354,10 +348,6 @@ public class Stateful extends Drone{
 			//			for each neighbor of current
 			for (Direction d : availableDirection(current)) {
 				Position neighbor = current.nextPosition(d);//TODO check if pass other 
-				
-							
-
-				
 				double tentative_gScore=gScore.get(current)+0.0003;
 				if(!gScore.containsKey(neighbor)) {
 					gScore.put(neighbor, 100.0);

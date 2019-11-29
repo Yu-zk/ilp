@@ -14,8 +14,7 @@ public class Drone {
     protected String out = "";
     protected ArrayList<Point> points = new ArrayList<Point>();
     protected int step = 0;
-    
-    
+       
     
     protected Drone(double latitude, double longitude, ArrayList<Station> stations, int seed) {
 		this.currentPosition = new Position(latitude, longitude);
@@ -24,6 +23,7 @@ public class Drone {
 		this.coins = 0;
 		this.power = 250;
 	}
+
     protected double setCoins(double coins) {
 		double coinsBefore = this.coins;
 		if (this.coins + coins <= 0) {
@@ -34,8 +34,6 @@ public class Drone {
 			return -coins;
 		}
 	}
-
-
 
 	protected double setPower(double power) {
 		double powerBefore = this.power;
@@ -53,5 +51,4 @@ public class Drone {
 	public ArrayList<Point> getPoints() {
 		return points;
 	}
-
 }

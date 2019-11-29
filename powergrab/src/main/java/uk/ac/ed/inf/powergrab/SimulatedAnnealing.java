@@ -45,10 +45,10 @@ public class SimulatedAnnealing {
 	//返回近似的 最佳旅行路径
 	private static Tour sa() {
 		// 初始化温度
-		double temp = 100;
+		double temp = 400;
 
 		// 冷却概率
-		double coolingRate = 0.00000003;
+		double coolingRate = 0.0025;
 
 		// 初始化的解决方案
 		Tour currentSolution = new Tour();
