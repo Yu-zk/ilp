@@ -27,7 +27,7 @@ public class Play {
 //			StatefulOld play = new StatefulOld(latitude, longitude, seed, stations);
 			Stateful play = new Stateful(latitude, longitude, seed, stations);
 			play.run();
-//			play.astar(new Position(55.946233,-3.192473), new Station( "id", 1,1,  "lighthouse",  "color",  55.942617,-3.184319));
+//			play.astar(new Position(55.9431,-3.1922), new Station( "id", 1.0,1.0,  Symbol.lighthouse,  "color",  55.9456,-3.1845));
 			wirteFile(String.format("stateful-%s-%s-%s.txt", day, month, year),play.getOut());
 			wirteFile(String.format("stateful-%s-%s-%s.geojson", day, month, year),toJson(play.getPoints()));
 //	        System.out.println(play.getOut());
@@ -108,7 +108,7 @@ public class Play {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}    	
+		}
     	return mapSource;
     }
     

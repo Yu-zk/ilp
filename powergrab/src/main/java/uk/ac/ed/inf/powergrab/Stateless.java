@@ -123,20 +123,4 @@ public class Stateless extends Drone {
 	}
 	
 }
-//Comparator<Station> c=new Comparator<Station>()  {
-//
-//	@Override
-//	public int compare(Station o1, Station o2) {
-//		double d = (distance(o1.getLatitude(), o1.getLongitude(), p1.latitude, p1.longitude) - 
-//				distance(o2.getLatitude(), o2.getLongitude(), p1.latitude, p1.longitude));
-//		if (d>0){
-//			return 1;
-//		}else if(d==0) {
-//			return 0;
-//		}else {
-//			return -1;
-//		}
-//	}
-//};
-//Collections.sort(ss,c);
-//r.put(d, ss.get(0));
+

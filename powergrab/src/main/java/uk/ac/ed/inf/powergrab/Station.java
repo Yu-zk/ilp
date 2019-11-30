@@ -79,9 +79,6 @@ public class Station {
 		this.longitude = longitude;
 	}
 
-	
-
-
 	@Override
 	public String toString() {
 		return "Station [id=" + id + ", coins=" + coins + ", power=" + power + ", symbol=" + symbol + ", color=" + color
