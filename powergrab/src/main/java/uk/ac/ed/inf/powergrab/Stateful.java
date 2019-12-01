@@ -23,7 +23,6 @@ public class Stateful extends Drone{
 				lighthouse.add(s);
 			}
 		}
-
 		lighthouse = sort(lighthouse);
 		for (Station s:stations) {
 			if (Symbol.danger==s.getSymbol()) {
@@ -46,6 +45,10 @@ public class Stateful extends Drone{
 		};
 		Collections.sort(danger,c);
 	}
+	public void run() {
+		while(step < 250 && next()) {}
+		System.out.printf("%f %f ",coins,power);
+	}
 	private ArrayList<Station> sort(ArrayList<Station> original){
 		ArrayList<Station> sorted = new ArrayList<Station>();
 		Position p = currentPosition;
@@ -65,49 +68,8 @@ public class Stateful extends Drone{
 		}
 		return sorted;
 	}
-	public void run() {
-		while(step < 250 && next()) {}
-		System.out.printf("%f %f ",coins,power);
-	}
-	private void randomStep() {
-		StringBuilder sb = new StringBuilder(); 
-		if (setPower(-1.25)!=1.25|| step>=250) {
-			return;
-		}
-		sb.append(currentPosition.latitude);sb.append(",");
-		sb.append(currentPosition.longitude);sb.append(",");	
-		step ++;
-		ArrayList<Direction> availableDirections=availableDirection(currentPosition);
-		nextD=availableDirections.get(rnd.nextInt(availableDirections.size()));
-
-		currentPosition=currentPosition.nextPosition(nextD);
-		ArrayList<Station> withinStation = new ArrayList<Station>();
-		for (Station s : lighthouseCopy) {
-			if (s.distance(currentPosition)<0.00025) {
-				withinStation.add(s);
-			}
-		}
-		double min=10;
-		if (withinStation.size()>0) {
-			min=10;
-			Station nearestStation=withinStation.get(0);
-			for (Station s:withinStation) {
-				if(s.distance(currentPosition)<min) {
-					min=s.distance(currentPosition);
-					nearestStation=s;
-				}
-			}
-			nearestStation.update(setCoins(nearestStation.getCoins()),setPower(nearestStation.getPower()));
-			lighthouse.remove(nearestStation);
-		}
-		sb.append(nextD);sb.append(",");
-		sb.append(currentPosition.latitude);sb.append(",");
-		sb.append(currentPosition.longitude);sb.append(",");
-		sb.append(coins);sb.append(",");
-		sb.append(power);sb.append("\n");
-		points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
-		out = out + sb.toString();
-	}
+	
+	
 	private boolean next() {
 		if(lighthouse.size()==0) {
 			StringBuilder sb = new StringBuilder(); 
@@ -159,6 +121,28 @@ public class Stateful extends Drone{
 		return this.power>0;
 	}
 
+
+	private boolean inRange(Station targetStation, Position p) {
+		if (targetStation.distance(p)>0.00025) {return false;}
+		double d = targetStation.distance(p);
+		for (Station s : stations) {
+			if (s.distance(p)<d) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private ArrayList<Direction> availableDirection(Position s) {
+		ArrayList<Direction> availableDirection = new ArrayList<Direction>();
+		for (Direction d : Direction.values()) {
+			Position nextP = s.nextPosition(d);
+			if (!isHarmful(nextP)&&nextP.inPlayArea()) {
+				availableDirection.add(d);
+			}
+		}
+		return availableDirection;
+	}
 	private boolean isHarmful(Position p) {
 		double min = 0.00025;
 		Station nearestStation= null;
@@ -174,73 +158,45 @@ public class Stateful extends Drone{
 		}
 		return Symbol.danger==nearestStation.getSymbol();
 	}
+	private void randomStep() {
+		StringBuilder sb = new StringBuilder(); 
+		if (setPower(-1.25)!=1.25|| step>=250) {
+			return;
+		}
+		sb.append(currentPosition.latitude);sb.append(",");
+		sb.append(currentPosition.longitude);sb.append(",");	
+		step ++;
+		ArrayList<Direction> availableDirections=availableDirection(currentPosition);
+		nextD=availableDirections.get(rnd.nextInt(availableDirections.size()));
 
-	private boolean inRange(Station targetStation, Position p) {
-		if (targetStation.distance(p)>0.00025) {return false;}
-		double d = targetStation.distance(p);
-		for (Station s : stations) {
-			if (s.distance(p)<d) {
-				return false;
+		currentPosition=currentPosition.nextPosition(nextD);
+		ArrayList<Station> withinStation = new ArrayList<Station>();
+		for (Station s : lighthouseCopy) {
+			if (s.distance(currentPosition)<0.00025) {
+				withinStation.add(s);
 			}
 		}
-		return true;
-	}
-	private Direction opposite(Direction d) {
-		if (d==null) {
-			return null;
-		}
-		switch (d) {
-		case E:
-			return (Direction.W);
-		case ENE:
-			return (Direction.WSW);
-		case NE:
-			return (Direction.SW);
-		case NNE:
-			return (Direction.SSW);
-		case N:
-			return (Direction.S);
-		case NNW:
-			return (Direction.SSE);
-		case NW:
-			return (Direction.SE);
-		case WNW:
-			return (Direction.ESE);
-		case W:
-			return (Direction.E);
-		case WSW:
-			return (Direction.ENE);
-		case SW:
-			return (Direction.NE);
-		case SSW:
-			return (Direction.NNE);
-		case S:
-			return (Direction.N);
-		case SSE:
-			return (Direction.E);
-		case SE:
-			return (Direction.NW);
-		case ESE:
-			return (Direction.WNW);
-		default:
-			throw new IllegalArgumentException("Direction does not exist.");
-		}
-	}
-
-	private double h(Position p, Position goal) {
-		return goal.distance(p);
-	}
-	private ArrayList<Direction> availableDirection(Position s) {
-		ArrayList<Direction> availableDirection = new ArrayList<Direction>();
-		for (Direction d : Direction.values()) {
-			Position nextP = s.nextPosition(d);
-			if (!isHarmful(nextP)&&nextP.inPlayArea()) {
-				availableDirection.add(d);
+		double min=10;
+		if (withinStation.size()>0) {
+			min=10;
+			Station nearestStation=withinStation.get(0);
+			for (Station s:withinStation) {
+				if(s.distance(currentPosition)<min) {
+					min=s.distance(currentPosition);
+					nearestStation=s;
+				}
 			}
+			nearestStation.update(setCoins(nearestStation.getCoins()),setPower(nearestStation.getPower()));
+			lighthouse.remove(nearestStation);
 		}
-		return availableDirection;
+		sb.append(nextD);sb.append(",");
+		sb.append(currentPosition.latitude);sb.append(",");
+		sb.append(currentPosition.longitude);sb.append(",");
+		sb.append(coins);sb.append(",");
+		sb.append(power);sb.append("\n");
+		points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
+		out = out + sb.toString();
 	}
-	
 	private void path(HashMap<Position, Position> cameFrom,Position current,String targetID) {
 		ArrayList<Position> path = new ArrayList<Position>();
 		path.add(current);
@@ -333,22 +289,17 @@ public class Stateful extends Drone{
 				}
 				if (tentative_gScore<gScore.get(neighbor)) {
 					cameFrom.put(neighbor, current);
-
 					gScore.put(neighbor, tentative_gScore);
 					fScore.put(neighbor, gScore.get(neighbor)+h(neighbor,goal));
-					//System.out.println(gScore.get(neighbor)+h(neighbor,goal));
-
-//					if(!openSet.contains(neighbor)){
-//						openSet.add(neighbor);
-//					}
 					if(!isExplored(openSet,neighbor)){
 						openSet.add(neighbor);
 					}
 				}
 			}
-
-
 		}
+	}
+	private double h(Position p, Position goal) {
+		return goal.distance(p);
 	}
 	private boolean isExplored(ArrayList<Position> openSet, Position p) {
 		for (Position s : openSet) {
@@ -358,6 +309,47 @@ public class Stateful extends Drone{
 			}
 		}
 		return false;
+	}
+	private Direction opposite(Direction d) {
+		if (d==null) {
+			return null;
+		}
+		switch (d) {
+		case E:
+			return (Direction.W);
+		case ENE:
+			return (Direction.WSW);
+		case NE:
+			return (Direction.SW);
+		case NNE:
+			return (Direction.SSW);
+		case N:
+			return (Direction.S);
+		case NNW:
+			return (Direction.SSE);
+		case NW:
+			return (Direction.SE);
+		case WNW:
+			return (Direction.ESE);
+		case W:
+			return (Direction.E);
+		case WSW:
+			return (Direction.ENE);
+		case SW:
+			return (Direction.NE);
+		case SSW:
+			return (Direction.NNE);
+		case S:
+			return (Direction.N);
+		case SSE:
+			return (Direction.E);
+		case SE:
+			return (Direction.NW);
+		case ESE:
+			return (Direction.WNW);
+		default:
+			throw new IllegalArgumentException("Direction does not exist.");
+		}
 	}
 
 }
