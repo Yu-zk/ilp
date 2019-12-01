@@ -22,7 +22,7 @@ public class Play {
 	public Play(String day, String month, String year, double latitude, double longitude, int seed, String mode) {
 //		super();
 		ArrayList<Station> stations = buildMap(year, month, day);
-		System.out.printf("%s %s %s\n",year,month,day);
+//		System.out.printf("%s %s %s\n",year,month,day);
 		if ("stateful".equals(mode)) {
 //			StatefulOld play = new StatefulOld(latitude, longitude, seed, stations);
 			Stateful play = new Stateful(latitude, longitude, seed, stations);
@@ -30,13 +30,11 @@ public class Play {
 //			play.astar(new Position(55.9431,-3.1922), new Station( "id", 1.0,1.0,  Symbol.lighthouse,  "color",  55.9456,-3.1845));
 			wirteFile(String.format("stateful-%s-%s-%s.txt", day, month, year),play.getOut());
 			wirteFile(String.format("stateful-%s-%s-%s.geojson", day, month, year),toJson(play.getPoints()));
-//	        System.out.println(play.getOut());
 		}else {
 			Stateless play = new Stateless(latitude, longitude, seed, stations);
 			play.run();
 			wirteFile(String.format("stateless-%s-%s-%s.txt", day, month, year),play.getOut());
 			wirteFile(String.format("stateless-%s-%s-%s.geojson", day, month, year),toJson(play.getPoints()));
-//	        System.out.println(play.getOut());
 		}
 //        for (Station s:stations) {
 //        	if (Symbol.lighthouse==s.getSymbol()){
@@ -52,7 +50,6 @@ public class Play {
 //        }
 //
 //        wirteFile(String.format("dronetype-%s-%s-%s.geojson", day, month, year),toJson(p));
-		//insure stations is not null
 		
 
 		

@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import com.mapbox.geojson.Point;
 
-public class Stateful extends Drone{
+public class Statefultest extends Drone{
 
 	private Direction nextD=Direction.N;
 	private ArrayList<Station> lighthouse;
@@ -14,7 +14,7 @@ public class Stateful extends Drone{
 	private ArrayList<Station> danger = new ArrayList<Station>();
 	private int tryTime = 0;
 
-	public Stateful(double latitude, double longitude, int seed, ArrayList<Station> stations) {
+	public Statefultest(double latitude, double longitude, int seed, ArrayList<Station> stations) {
 		super(latitude, longitude, stations, seed);
 		points.add(Point.fromLngLat(longitude, latitude));
 		lighthouse = new ArrayList<Station>();
@@ -23,7 +23,6 @@ public class Stateful extends Drone{
 				lighthouse.add(s);
 			}
 		}
-
 		lighthouse = sort(lighthouse);
 		for (Station s:stations) {
 			if (Symbol.danger==s.getSymbol()) {
@@ -67,7 +66,6 @@ public class Stateful extends Drone{
 	}
 	public void run() {
 		while(step < 250 && next()) {}
-		System.out.printf("%f %f ",coins,power);
 	}
 	private void randomStep() {
 		StringBuilder sb = new StringBuilder(); 
@@ -77,28 +75,18 @@ public class Stateful extends Drone{
 		sb.append(currentPosition.latitude);sb.append(",");
 		sb.append(currentPosition.longitude);sb.append(",");	
 		step ++;
-		ArrayList<Direction> availableDirections=availableDirection(currentPosition);
-		nextD=availableDirections.get(rnd.nextInt(availableDirections.size()));
-
+		HashMap<Direction, Station> availableDirections=availableDirection(currentPosition);
+		ArrayList<Direction> directions = new ArrayList<Direction>();
+		directions.addAll(availableDirections.keySet());
+		nextD=directions.get(rnd.nextInt(directions.size()));
+		
 		currentPosition=currentPosition.nextPosition(nextD);
-		ArrayList<Station> withinStation = new ArrayList<Station>();
-		for (Station s : lighthouseCopy) {
-			if (s.distance(currentPosition)<0.00025) {
-				withinStation.add(s);
-			}
-		}
-		double min=10;
-		if (withinStation.size()>0) {
-			min=10;
-			Station nearestStation=withinStation.get(0);
-			for (Station s:withinStation) {
-				if(s.distance(currentPosition)<min) {
-					min=s.distance(currentPosition);
-					nearestStation=s;
-				}
-			}
-			nearestStation.update(setCoins(nearestStation.getCoins()),setPower(nearestStation.getPower()));
-			lighthouse.remove(nearestStation);
+		
+		Station nextS=availableDirections.get(nextD);
+		
+		if (!(nextS==null)) {
+			nextS.update(setCoins(nextS.getCoins()),setPower(nextS.getPower()));
+			lighthouse.remove(nextS);
 		}
 		sb.append(nextD);sb.append(",");
 		sb.append(currentPosition.latitude);sb.append(",");
@@ -113,7 +101,7 @@ public class Stateful extends Drone{
 			StringBuilder sb = new StringBuilder(); 
 			for (Direction d : Direction.values()) {
 				Position p = currentPosition.nextPosition(d);
-				if (!isHarmful(p)&&p.inPlayArea()) {
+				if ((nearestStation(p)==null||nearestStation(p).getSymbol()!=Symbol.danger)&&p.inPlayArea()) {
 					nextD=d;
 					break;
 				}
@@ -159,7 +147,7 @@ public class Stateful extends Drone{
 		return this.power>0;
 	}
 
-	private boolean isHarmful(Position p) {
+	private Station nearestStation(Position p) {
 		double min = 0.00025;
 		Station nearestStation= null;
 		for (Station s: stations) {
@@ -169,10 +157,10 @@ public class Stateful extends Drone{
 				nearestStation = s;
 			}
 		}
-		if (nearestStation==null) {
-			return false;
-		}
-		return Symbol.danger==nearestStation.getSymbol();
+//		if (nearestStation==null) {
+//			return false;
+//		}
+		return nearestStation;
 	}
 
 	private boolean inRange(Station targetStation, Position p) {
@@ -230,12 +218,13 @@ public class Stateful extends Drone{
 	private double h(Position p, Position goal) {
 		return goal.distance(p);
 	}
-	private ArrayList<Direction> availableDirection(Position s) {
-		ArrayList<Direction> availableDirection = new ArrayList<Direction>();
+	private HashMap<Direction, Station> availableDirection(Position s) {
+		HashMap<Direction, Station> availableDirection = new HashMap<Direction, Station>();
 		for (Direction d : Direction.values()) {
 			Position nextP = s.nextPosition(d);
-			if (!isHarmful(nextP)&&nextP.inPlayArea()) {
-				availableDirection.add(d);
+			Station nearestS = nearestStation(nextP);
+			if ((nearestS==null||nearestS.getSymbol()!=Symbol.danger)&&nextP.inPlayArea()) {
+				availableDirection.put(d, nearestS);
 			}
 		}
 		return availableDirection;
@@ -325,7 +314,8 @@ public class Stateful extends Drone{
 			openSet.remove(current);
 
 			//			for each neighbor of current
-			for (Direction d : availableDirection(current)) {
+			for (Direction d : availableDirection(current).keySet()) {
+//				System.out.println();
 				Position neighbor = current.nextPosition(d);//TODO check if pass other 
 				double tentative_gScore=gScore.get(current)+0.0003;
 				if(!gScore.containsKey(neighbor)) {
