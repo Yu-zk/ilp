@@ -9,28 +9,29 @@ import com.mapbox.geojson.Point;
 public class Stateful extends Drone{
 
 	private Direction nextD=Direction.N;
-	private ArrayList<Station> lighthouse = new ArrayList<Station>();
+	private ArrayList<Station> lighthouse;
+	private ArrayList<Station> lighthouseCopy;
 	private ArrayList<Station> danger = new ArrayList<Station>();
 	private int tryTime = 0;
-
 
 	public Stateful(double latitude, double longitude, int seed, ArrayList<Station> stations) {
 		super(latitude, longitude, stations, seed);
 		points.add(Point.fromLngLat(longitude, latitude));
+		lighthouse = new ArrayList<Station>();
 		for (Station s:stations) {
 			if (Symbol.lighthouse==s.getSymbol()) {
 				lighthouse.add(s);
 			}
 		}
-		
+		lighthouse = new ArrayList<Station>();
 		lighthouse = sort(lighthouse);
 		for (Station s:stations) {
 			if (Symbol.danger==s.getSymbol()) {
 				danger.add(s);
 			}
 		}
+		lighthouseCopy = new ArrayList<Station>(lighthouse);
 		Comparator<Station> c=new Comparator<Station>()  {
-		
 			@Override
 			public int compare(Station o1, Station o2) {
 				double d = (o1.getCoins()-o2.getCoins());
@@ -49,7 +50,6 @@ public class Stateful extends Drone{
 		ArrayList<Station> sorted = new ArrayList<Station>();
 		Position p = currentPosition;
 		Station nextS = null;
-		
 		while (original.size()>0) {
 			double min=10;
 			for (Station s: original) {
@@ -62,17 +62,11 @@ public class Stateful extends Drone{
 			sorted.add(nextS);
 			original.remove(nextS);
 			p=nextS.toPosition();
-//			points.add(Point.fromLngLat(p.longitude, p.latitude));
 		}
-		
-		
 		return sorted;
 	}
 	public void run() {
-		while(step < 250 && next()) {
-			
-		}
-//		System.out.printf("%f %f\n",coins,power);
+		while(step < 250 && next()) {}
 	}
 	private void randomStep() {
 		StringBuilder sb = new StringBuilder(); 
@@ -87,11 +81,9 @@ public class Stateful extends Drone{
 
 		currentPosition=currentPosition.nextPosition(nextD);
 		ArrayList<Station> withinStation = new ArrayList<Station>();
-		for (Station s : stations) {
+		for (Station s : lighthouseCopy) {
 			if (s.distance(currentPosition)<0.00025) {
 				withinStation.add(s);
-//				s.update(setCoins(s.getCoins()),setPower(s.getPower()));
-//				break;
 			}
 		}
 		double min=10;
@@ -117,7 +109,6 @@ public class Stateful extends Drone{
 	}
 	private boolean next() {
 		if(lighthouse.size()==0) {
-//			System.out.println("finish");
 			StringBuilder sb = new StringBuilder(); 
 			for (Direction d : Direction.values()) {
 				Position p = currentPosition.nextPosition(d);
@@ -138,15 +129,14 @@ public class Stateful extends Drone{
 				sb.append(coins);sb.append(",");
 				sb.append(power);sb.append("\n");
 				points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
-				out = out + sb.toString();
 			}
+			out = out + sb.toString();
 			return false;
 		}else {
 			Station target = lighthouse.get(0);
 			
 			if (target.distance(currentPosition)<0.00025) {
 				randomStep();
-				
 			}else {
 				if (tryTime<20) {
 					astar(currentPosition,target);
@@ -161,41 +151,13 @@ public class Stateful extends Drone{
 							danger.get(i).setSymbol(Symbol.danger);
 						}
 					}
-					
-					
 				}
-				
 //				System.out.printf(" %d %s %s\n",step,currentPosition.toString(),target.toPosition().toString());
 			}
-			
-			
-
 		}
-
 		return this.power>0;
 	}
 
-
-	private Direction nextDirection(Station s) {
-		double min = 1;
-		Direction nextD = null;
-		Direction nextDWithNeg = null;
-		for (Direction d : Direction.values()) {
-			Position nextPosition = currentPosition.nextPosition(d);
-			double distance = s.distance(nextPosition);
-			if (distance < min && nextPosition.inPlayArea()) {
-				nextDWithNeg = d;
-				if (!isHarmful(nextPosition)) {
-					min = distance;
-					nextD = d;
-				}
-			}
-		}
-		if (nextD==null) {
-			return nextDWithNeg;
-		}
-		return nextD;
-	}
 	private boolean isHarmful(Position p) {
 		double min = 0.00025;
 		Station nearestStation= null;
@@ -264,10 +226,8 @@ public class Stateful extends Drone{
 		}
 	}
 
-
 	private double h(Position p, Position goal) {
 		return goal.distance(p);
-
 	}
 	private ArrayList<Direction> availableDirection(Position s) {
 		ArrayList<Direction> availableDirection = new ArrayList<Direction>();
@@ -287,10 +247,7 @@ public class Stateful extends Drone{
 			current=cameFrom.get(current);
 			path.add(current);
 		}
-		
 		Collections.reverse(path);
-		
-		
 		StringBuilder sb = new StringBuilder(); //check length <30
 		for(int i = 1;i<path.size();i++) {
 			if (setPower(-1.25)!=1.25|| step>=250) {
@@ -300,7 +257,6 @@ public class Stateful extends Drone{
 			sb.append(path.get(i-1).latitude);sb.append(",");
 			sb.append(path.get(i-1).longitude);sb.append(",");	
 			step ++;
-			
 			//move
 			
 			currentPosition=path.get(i);
@@ -310,14 +266,12 @@ public class Stateful extends Drone{
 					break;
 				}
 			}
-			
-			
 			sb.append(nextD);sb.append(",");
 			sb.append(path.get(i).latitude);sb.append(",");
 			sb.append(path.get(i).longitude);sb.append(",");
 			
 			if(i==path.size()-1) {
-				for (Station s : stations) {
+				for (Station s : lighthouseCopy) {
 					if (targetID.equals(s.getId())) {
 						s.update(setCoins(s.getCoins()),setPower(s.getPower()));
 						break;
@@ -329,44 +283,19 @@ public class Stateful extends Drone{
 			points.add(Point.fromLngLat(path.get(i).longitude, path.get(i).latitude));
 		}
 		out = out + sb.toString();
-
-		
-	}
-	private boolean arrive(Position current, Station target) {
-		if (target.distance(current)>=0.00025) {return false;}
-//		for (Station s : stations) {
-//			if (s.distance(current)<0.00025&&!s.equals(target)) {
-//				return false;
-//			}
-//		}
-		return true;
 	}
 	public void astar(Position start, Station target) {
 		Position goal = target.toPosition();
 		ArrayList<Position> openSet = new ArrayList<Position>();
 		openSet.add(start);
-
 		HashMap<Position, Position> cameFrom = new HashMap<Position, Position>();
-
 		HashMap<Position, Double> gScore = new HashMap<Position, Double>();
 		gScore.put(start, 0.0);
-
 		HashMap<Position, Double> fScore = new HashMap<Position, Double>();
 		fScore.put(start, h(start,goal));
-
-
 		while (openSet.size()>0) {
-
-			if (openSet.size()>8000) {//50000
-//				target.setSymbol(Symbol.blackwhole);
-//				System.out.printf("%d ",openSet.size());
-//				System.out.print(lighthouse);
-//				if (lighthouse.size()==1) {
-//					astar(start, previousStation[0]);
-//				}else {
+			if (openSet.size()>8000) {
 				randomStep();
-//				lighthouse.add(1,target);
-//				}
 				tryTime++;
 				return;
 			}
@@ -380,16 +309,17 @@ public class Stateful extends Drone{
 			}
 			if (min==100) {continue;}
 
-//			if (goal.distance(current)<0.00025) {//in range
-			if (arrive(current,target)) {//in range
-				//reconstruct_path(cameFrom, current)
-				tryTime=0;
+			if (goal.distance(current)<0.00025) {//in range
 				lighthouse.remove(target);
 				path(cameFrom,current,target.getId());
-				System.out.printf("%d ",openSet.size());
+//				if (tryTime>1) {
+//					System.out.printf("%d ",tryTime);
+//				}
+				
+				tryTime=0;
 				return;
 			}
-//			System.out.println(openSet.size());
+			System.out.println(openSet.size());
 
 			openSet.remove(current);
 
