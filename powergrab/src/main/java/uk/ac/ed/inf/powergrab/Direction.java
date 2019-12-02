@@ -1,5 +1,8 @@
 package uk.ac.ed.inf.powergrab;
-
+/**
+ * An enum class contains 16 directions.
+ *
+ */
 public enum Direction {
     
 	N, NNE, NE, ENE, 

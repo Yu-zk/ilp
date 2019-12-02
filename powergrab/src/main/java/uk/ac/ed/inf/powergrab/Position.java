@@ -1,8 +1,18 @@
 package uk.ac.ed.inf.powergrab;
-
+/**
+ * An class to represent a position on the map.
+ * Each positions are identified by a latitude and a longitude.
+ *
+ */
 public class Position {
 	public double latitude;
 	public double longitude;
+	
+	/**
+	 * Create a new position and sets the location of this position to the specified double latitude and longitude.
+	 * @param latitude - the latitude of the position
+     * @param longitude - the longitude of the position
+	 */
 	public Position(double latitude, double longitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;
@@ -14,7 +24,12 @@ public class Position {
 	public static final double sin225 = 0.0003 * Math.sin(Math.PI / 8);
 	public static final double cos225 = 0.0003 * Math.cos(Math.PI / 8);
 	
-	
+	/**
+	 * Calculate the final position from the current position with a given direction.
+	 * The position itself will not be changed.
+	 * @param direction - The direction it wants to go.
+	 * @return the next position after moving toward the direction specified
+	 */
 	public Position nextPosition(Direction direction) { 
 		// use switch to check which direction it goes and return the final position with the value calculated before.
 		switch (direction) {
@@ -53,8 +68,12 @@ public class Position {
 		    default:
 		    	throw new IllegalArgumentException("Direction does not exist.");
 		}
-		
 	}
+	
+	/**
+	 * Determines whether or not this position is in the specific area.
+	 * @return true if this position is in the specific area; false otherwise.
+	 */
 	public boolean inPlayArea() {
 		// drone on the edge is invalid, so no equal in the condition.
 		if (latitude > 55.942617 && latitude < 55.946233 
@@ -64,17 +83,21 @@ public class Position {
 		return false;
 	}
 	
-//	public boolean equals(Position p) {
-//		return p.latitude==latitude && p.longitude==longitude;
-//	}
+	/**
+	 * Returns the Euclidean distance from this position to a specified position.
+	 * @param p - The specified position to be measured against this position
+	 * @return the Euclidean distance between this position and a specified position.
+	 */
 	public double distance(Position p) {
 		return Math.sqrt((latitude-p.latitude)*(latitude-p.latitude) + (longitude-p.longitude)*(longitude-p.longitude));
 	}
+	
+	/**
+	 * Override the toString method to make the output easier to read when debug.
+	 */
 	@Override
 	public String toString() {
 		return "Position (" + latitude + ", " + longitude + ")";
 	}
-	
-	
 	
 }

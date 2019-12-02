@@ -1,16 +1,32 @@
 package uk.ac.ed.inf.powergrab;
-
+/**
+ * An class to represent a station on the map.
+ * Each stations have latitude ,longitude, id, coin, power, symbol, color.
+ * Coin, power and symbol can be changed when the drone passes it.
+ */
 public class Station {
 	private String id;
+	private double latitude;
+	private double longitude;
     private double coins;
     private double power;
     private Symbol symbol;
     private String color;
-    private double latitude;
-	private double longitude;
+    
+	
+	/**
+	 * Create a new station and set the location of the station to specific double latitude ,longitude
+	 * Also set the id, coin, power, symbol, color for the station.
+	 *      * @param id
+     * @param coins - the coin of the station
+     * @param power - the power of the station
+     * @param symbol - the symbol of the station
+     * @param color - the color of the station
+     * @param latitude - the latitude of the station
+     * @param longitude - the longitude of the station
+	 */
 	public Station(String id, double coins, double power, Symbol symbol, String color, double latitude,
 			double longitude) {
-		super();
 		this.id = id;
 		this.coins = coins;
 		this.power = power;
@@ -19,6 +35,15 @@ public class Station {
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
+	
+	/**
+	 * Update the information of the station.
+	 * When a drone passes the station, the drone will collect coins and power.
+	 * This method can reduce the coins and power collected by the drone.
+	 * When both coins and power is zero, it changes the symbol zero.
+	 * @param coins - coins that the drone collected
+	 * @param power - power that the drone collected
+	 */
 	public void update(double coins, double power) {
 		this.coins = this.coins + coins;
 		this.power = this.power + power;
@@ -26,16 +51,27 @@ public class Station {
 			this.symbol = Symbol.zero;
 		}
 	}
+	
+	/**
+	 * Returns the Euclidean distance from this station to a specified position.
+	 * @param p - The specified position to be measured against this station
+	 * @return the Euclidean distance between this station and a specified position.
+	 */
 	public double distance(Position p) {
 		return Math.sqrt((latitude-p.latitude)*(latitude-p.latitude) + (longitude-p.longitude)*(longitude-p.longitude));
 	}
-	public Position toPosition() {
-		return new Position(latitude, longitude);
-	}
 	
+	/**
+	 * Generate a position instance which has the same latitude and longitude with the station.
+	 * @return Position
+	 */
 	public Position getPosition() {
 		return new Position(latitude, longitude);
 	}
+	
+	/**
+	 * getter and setter for all private variable
+	 */
 	public Symbol getSymbol() {
 		return symbol;
 	}
@@ -79,15 +115,13 @@ public class Station {
 		this.longitude = longitude;
 	}
 
+	/**
+	 * Override the toString method to make the output easier to read when debug.
+	 */
 	@Override
 	public String toString() {
-		return "Station [id=" + id + ", coins=" + coins + ", power=" + power + ", symbol=" + symbol + ", color=" + color
-				+ ", latitude=" + latitude + ", longitude=" + longitude + "]\n";
+		return "Station [id=" + id + ", latitude=" + latitude + ", longitude=" + longitude + ", coins=" + coins
+				+ ", power=" + power + ", symbol=" + symbol + ", color=" + color + "]";
 	}
-	
-    
-
-    
-
 
 }

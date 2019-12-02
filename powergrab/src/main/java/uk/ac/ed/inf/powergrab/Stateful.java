@@ -9,27 +9,39 @@ import com.mapbox.geojson.Point;
 public class Stateful extends Drone{
 
 	private Direction nextD=Direction.N;
+	private ArrayList<Station> path;
 	private ArrayList<Station> lighthouse;
-	private ArrayList<Station> lighthouseCopy;
 	private ArrayList<Station> danger = new ArrayList<Station>();
 	private int tryTime = 0;
 
+	/**
+     * Constructor to create a new statefull drone instance by the constructor of superclass.
+     * Initialise the list path which contains all stations with the symbol lighthouse,
+     *   then create a path by the greedy algorithm.
+     * Initialise the list lighthouse which contains all stations with the symbol lighthouse.
+     * Initialise the list danger which contains all stations with the symbol danger,
+     *   then sort it with the descending order of coins.
+     * @param latitude - the latitude of this Drone
+     * @param longitude - the longitude of this Drone
+     * @param seed - the random seed
+     * @param stations - the list of all stations
+     */
 	public Stateful(double latitude, double longitude, int seed, ArrayList<Station> stations) {
-		super(latitude, longitude, stations, seed);
+		super(latitude, longitude, seed, stations);
 		points.add(Point.fromLngLat(longitude, latitude));
-		lighthouse = new ArrayList<Station>();
+		path = new ArrayList<Station>();
 		for (Station s:stations) {
 			if (Symbol.lighthouse==s.getSymbol()) {
-				lighthouse.add(s);
+				path.add(s);
 			}
 		}
-		lighthouse = sort(lighthouse);
+		path = findPath(path);
+		lighthouse = new ArrayList<Station>(path);
 		for (Station s:stations) {
 			if (Symbol.danger==s.getSymbol()) {
 				danger.add(s);
 			}
 		}
-		lighthouseCopy = new ArrayList<Station>(lighthouse);
 		Comparator<Station> c=new Comparator<Station>()  {
 			@Override
 			public int compare(Station o1, Station o2) {
@@ -45,11 +57,21 @@ public class Stateful extends Drone{
 		};
 		Collections.sort(danger,c);
 	}
+	
+	/**
+	 * Run the stateful simulator. Make a move, if the number of move is less than 250 and power is positive.
+	 */
 	public void run() {
 		while(step < 250 && next()) {}
-		System.out.printf("%f %f ",coins,power);
+//		System.out.printf("%f %f ",coins,power);
 	}
-	private ArrayList<Station> sort(ArrayList<Station> original){
+	
+	/**
+	 * Build a path with the shortest total distance by the greedy algorithm
+	 * @param original - an arraylist of the stations
+	 * @return an arraylist of the stations with the order
+	 */
+	private ArrayList<Station> findPath(ArrayList<Station> original){
 		ArrayList<Station> sorted = new ArrayList<Station>();
 		Position p = currentPosition;
 		Station nextS = null;
@@ -64,38 +86,22 @@ public class Stateful extends Drone{
 			}
 			sorted.add(nextS);
 			original.remove(nextS);
-			p=nextS.toPosition();
+			p=nextS.getPosition();
 		}
 		return sorted;
 	}
 	
+	/**
+	 * Make a move. Go to the next station with positive coin and power,
+	 * use method waste() to make moves after visiting all stations with positive coin and power.
+	 * @return true if the power is not negative; false otherwise.
+	 */
 	private boolean next() {
-		if(lighthouse.size()==0) {
-			StringBuilder sb = new StringBuilder(); 
-			for (Direction d : Direction.values()) {
-				Position p = currentPosition.nextPosition(d);
-				if (p.inPlayArea()&&(nearestStation(p)==null||!(nearestStation(p).getSymbol()==Symbol.danger))) {
-					nextD=d;
-					break;
-				}
-			}
-			while (setPower(-1.25)==1.25 && step<250) {
-				sb.append(currentPosition.latitude);sb.append(",");
-				sb.append(currentPosition.longitude);sb.append(",");	
-				step ++;
-				currentPosition=currentPosition.nextPosition(nextD);
-				nextD = opposite(nextD);
-				sb.append(nextD);sb.append(",");
-				sb.append(currentPosition.latitude);sb.append(",");
-				sb.append(currentPosition.longitude);sb.append(",");
-				sb.append(coins);sb.append(",");
-				sb.append(power);sb.append("\n");
-				points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
-			}
-			out = out + sb.toString();
+		if(path.size()==0) {
+			waste();
 			return false;
 		}else {
-			Station target = lighthouse.get(0);
+			Station target = path.get(0);
 			
 			if (target.distance(currentPosition)<0.00025) {
 				randomStep();
@@ -105,7 +111,7 @@ public class Stateful extends Drone{
 				}else {//change redpoint one by one
 					for (int i=0;i<danger.size();i++) {
 						if (-danger.get(i).getCoins()>target.getCoins()) {
-							lighthouse.remove(target);
+							path.remove(target);
 							break;
 						}else {
 							danger.get(i).setSymbol(Symbol.lighthouse);
@@ -120,7 +126,43 @@ public class Stateful extends Drone{
 		return this.power>0;
 	}
 
-	private boolean inRange(Station targetStation, Position p) {
+	/**
+	 * Find a direction which is not within the dangerous station and in the play area,
+	 * move with this direction and then return.
+	 * Repeat these 2 steps until 250 moves or no more power.
+	 */
+	private void waste() {
+		StringBuilder sb = new StringBuilder(); 
+		for (Direction d : Direction.values()) {
+			Position p = currentPosition.nextPosition(d);
+			if (p.inPlayArea()&&(nearestStation(p)==null||!(nearestStation(p).getSymbol()==Symbol.danger))) {
+				nextD=d;
+				break;
+			}
+		}
+		while (setPower(-1.25)==1.25 && step<250) {
+			sb.append(currentPosition.latitude);sb.append(",");
+			sb.append(currentPosition.longitude);sb.append(",");	
+			step ++;
+			currentPosition=currentPosition.nextPosition(nextD);
+			nextD = opposite(nextD);
+			sb.append(nextD);sb.append(",");
+			sb.append(currentPosition.latitude);sb.append(",");
+			sb.append(currentPosition.longitude);sb.append(",");
+			sb.append(coins);sb.append(",");
+			sb.append(power);sb.append("\n");
+			points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
+		}
+		out = out + sb.toString();
+	}
+	
+	/**
+	 * Check if the given position can charge from the given station
+	 * @param targetStation - the station which is charged
+	 * @param p - the position to be checked
+	 * @return true if given position can charge from the given station; false otherwise
+	 */
+	private boolean canCharge(Station targetStation, Position p) {
 		if (targetStation.distance(p)>0.00025) {return false;}
 		double d = targetStation.distance(p);
 		for (Station s : stations) {
@@ -131,16 +173,27 @@ public class Stateful extends Drone{
 		return true;
 	}
 	
-	private ArrayList<Direction> availableDirection(Position s) {
+	/**
+	 * Return an arraylist of direction which is valid(in the play area and cannot be discharged by nearby station) from specified position
+	 * @param p - a specified position
+	 * @return an arraylist of direction which is valid from specified position
+	 */
+	private ArrayList<Direction> availableDirection(Position p) {
 		ArrayList<Direction> availableDirection = new ArrayList<Direction>();
 		for (Direction d : Direction.values()) {
-			Position nextP = s.nextPosition(d);
+			Position nextP = p.nextPosition(d);
 			if (nextP.inPlayArea()&&(nearestStation(nextP)==null||!(nearestStation(nextP).getSymbol()==Symbol.danger))) {
 				availableDirection.add(d);
 			}
 		}
 		return availableDirection;
 	}
+	
+	/**
+	 * Return the station can be collected from the specified position, null if there is no station
+	 * @param p - a specified position
+	 * @return the station can be collected from the specified position
+	 */
 	private Station nearestStation(Position p) {
 		double min = 0.00025;
 		Station nearestStation= null;
@@ -153,6 +206,10 @@ public class Stateful extends Drone{
 		}
 		return nearestStation;
 	}
+	
+	/**
+	 * Take a random move to a position which is in the play area and cannot collect negative power and coin
+	 */
 	private void randomStep() {
 		StringBuilder sb = new StringBuilder(); 
 		if (setPower(-1.25)!=1.25|| step>=250) {
@@ -169,7 +226,7 @@ public class Stateful extends Drone{
 		
 		if (nearestStation!=null) {
 			nearestStation.update(setCoins(nearestStation.getCoins()),setPower(nearestStation.getPower()));
-			lighthouse.remove(nearestStation);
+			path.remove(nearestStation);
 		}
 
 		sb.append(nextD);sb.append(",");
@@ -180,7 +237,14 @@ public class Stateful extends Drone{
 		points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
 		out = out + sb.toString();
 	}
-	private void path(HashMap<Position, Position> cameFrom,Position current,String targetID) {
+	
+	/**
+	 * Reconstruct the path with the cameFrom hashmap created by the method astar
+	 * @param cameFrom - A hashmap which record the position immediately preceding it on the cheapest path
+	 * @param current - the start position
+	 * @param targetID - the ID of the target station
+	 */
+	private void reconstruct_path(HashMap<Position, Position> cameFrom, Position current, String targetID) {
 		ArrayList<Position> path = new ArrayList<Position>();
 		path.add(current);
 		while (cameFrom.keySet().contains(current)) {
@@ -197,11 +261,9 @@ public class Stateful extends Drone{
 			sb.append(path.get(i-1).latitude);sb.append(",");
 			sb.append(path.get(i-1).longitude);sb.append(",");	
 			step ++;
-			//move
-			
 			currentPosition=path.get(i);
 			for (Station s : stations) {
-				if (inRange(s,currentPosition)) {
+				if (canCharge(s,currentPosition)) {
 					s.update(setCoins(s.getCoins()),setPower(s.getPower()));
 					break;
 				}
@@ -211,7 +273,7 @@ public class Stateful extends Drone{
 			sb.append(path.get(i).longitude);sb.append(",");
 			
 			if(i==path.size()-1) {
-				for (Station s : lighthouseCopy) {
+				for (Station s : lighthouse) {
 					if (targetID.equals(s.getId())) {
 						s.update(setCoins(s.getCoins()),setPower(s.getPower()));
 						break;
@@ -224,8 +286,14 @@ public class Stateful extends Drone{
 		}
 		out = out + sb.toString();
 	}
+	
+	/**
+	 * Find a path to from specified position to the specified target station with the a star algorithm(from wikipedia)
+	 * @param start - the start position
+	 * @param target - the target station
+	 */
 	public void astar(Position start, Station target) {
-		Position goal = target.toPosition();
+		Position goal = target.getPosition();
 		ArrayList<Position> openSet = new ArrayList<Position>();
 		openSet.add(start);
 		HashMap<Position, Position> cameFrom = new HashMap<Position, Position>();
@@ -250,8 +318,8 @@ public class Stateful extends Drone{
 			if (min==100) {continue;}
 
 			if (goal.distance(current)<0.00025) {//in range
-				lighthouse.remove(target);
-				path(cameFrom,current,target.getId());
+				path.remove(target);
+				reconstruct_path(cameFrom,current,target.getId());
 				if (tryTime>1) {
 					System.out.printf("%d ",tryTime);
 				}
@@ -277,9 +345,23 @@ public class Stateful extends Drone{
 			}
 		}
 	}
+	
+	/**
+	 * Heuristic function for the a star algorithm.
+	 * @param p - the current position in the a star algorithm
+	 * @param goal - the goal position in the a star algorithm
+	 * @return the heuristic value at the specific position
+	 */
 	private double h(Position p, Position goal) {
 		return goal.distance(p);
 	}
+	
+	/**
+	 * Check if a specified position is in an arraylist of position
+	 * @param openSet - an arraylist of position
+	 * @param p - a position to be checked
+	 * @return true if the specified position is in an arraylist of position; false otherwise
+	 */
 	private boolean isExplored(ArrayList<Position> openSet, Position p) {
 		for (Position s : openSet) {
 			if (Double.compare(s.latitude, p.latitude)==0 &&
@@ -289,6 +371,12 @@ public class Stateful extends Drone{
 		}
 		return false;
 	}
+	
+	/**
+	 * Return the opposite direction with the given direction
+	 * @param d - a direction
+	 * @return the opposite direction with the given direction
+	 */
 	private Direction opposite(Direction d) {
 		if (d==null) {
 			return null;
