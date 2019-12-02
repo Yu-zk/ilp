@@ -14,8 +14,8 @@ public class App
         double longitude = Double.parseDouble(args[4]);
         int seed = Integer.parseInt(args[5]);
         String mode = args[6];
-        new Play(day, month, year, latitude, longitude, seed, mode);
-        
+//        new Play(day, month, year, latitude, longitude, seed, mode);
+//        
         // The following codes are for test only. It runs all days in 2 years and prints the time cost.
         /*
         int[] years = {2019,2020};

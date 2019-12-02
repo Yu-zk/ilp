@@ -101,7 +101,7 @@ public class Stateless extends Drone {
 	private Direction chososeDirection(HashMap<Direction, Station> availableStations) {
 		ArrayList<Direction> maxDirection = new ArrayList<Direction>();
 		double max = -126;
-		for (Direction d : Direction.values()) {
+		for (Direction d : availableStations.keySet()) {
 			double power=0;
 			if (availableStations.get(d) != null) {
 				power = availableStations.get(d).getPower();
