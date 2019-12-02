@@ -17,7 +17,6 @@ public class App
         new Play(day, month, year, latitude, longitude, seed, mode);
         
         // The following codes are for test only. It runs all days in 2 years and prints the time cost.
-        
         /*
         int[] years = {2019,2020};
         int[] months = {1,2,3,4,5,6,7,8,9,10,11,12};
