@@ -116,7 +116,15 @@ public class Stateful extends Drone{
 						}else {
 							danger.get(i).setSymbol(Symbol.lighthouse);
 							astar(currentPosition,target);
-							danger.get(i).setSymbol(Symbol.danger);
+							if (danger.get(i).getCoins()<0 && danger.get(i).getPower()<0) {
+								danger.get(i).setSymbol(Symbol.danger);
+							}else {
+								if (danger.get(i).getCoins()==0 && danger.get(i).getPower()==0) {
+									path.remove(target);
+								}
+								break;
+							}
+							
 						}
 					}
 				}
@@ -141,7 +149,7 @@ public class Stateful extends Drone{
 				break;
 			}
 		}
-		while (setPower(-1.25)==1.25 && step<250) {
+		while (setPower(-1.25f)==1.25 && step<250) {
 			sb.append(currentPosition.latitude);sb.append(",");
 			sb.append(currentPosition.longitude);sb.append(",");	
 			step ++;
@@ -195,7 +203,7 @@ public class Stateful extends Drone{
 	 */
 	private void randomStep() {
 		StringBuilder sb = new StringBuilder(); 
-		if (setPower(-1.25)!=1.25|| step>=250) {
+		if (setPower(-1.25f)!=1.25|| step>=250) {
 			return;
 		}
 		sb.append(currentPosition.latitude);sb.append(",");
@@ -245,7 +253,7 @@ public class Stateful extends Drone{
 			Position current = null;
 			double min=100;
 			for (Position p:openSet) {
-				if (fScore.get(p)<min && fScore.get(p)<0.01+target.distance(start)) {
+				if (fScore.get(p)<min) {
 					current=p;
 					min=fScore.get(p);
 				}
@@ -302,7 +310,7 @@ public class Stateful extends Drone{
 		Collections.reverse(directionPath);
 		StringBuilder sb = new StringBuilder();
 		for(int i = 1;i<path.size();i++) {
-			if (setPower(-1.25)!=1.25|| step>=250) {
+			if (setPower(-1.25f)!=1.25|| step>=250) {
 				output = output + sb.toString();
 				return;
 			}

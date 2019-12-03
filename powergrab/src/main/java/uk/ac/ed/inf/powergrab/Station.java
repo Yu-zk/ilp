@@ -8,8 +8,8 @@ public class Station {
 	private String id;
 	private double latitude;
 	private double longitude;
-    private double coins;
-    private double power;
+    private float coins;
+    private float power;
     private Symbol symbol;
     private String color;
     
@@ -25,7 +25,7 @@ public class Station {
      * @param latitude - the latitude of the station
      * @param longitude - the longitude of the station
 	 */
-	public Station(String id, double coins, double power, Symbol symbol, String color, double latitude,
+	public Station(String id, float coins, float power, Symbol symbol, String color, double latitude,
 			double longitude) {
 		this.id = id;
 		this.coins = coins;
@@ -44,7 +44,7 @@ public class Station {
 	 * @param coins - coins that the drone collected
 	 * @param power - power that the drone collected
 	 */
-	public void update(double coins, double power) {
+	public void update(float coins, float power) {
 		this.coins = this.coins + coins;
 		this.power = this.power + power;
 		if (this.coins == 0 && this.power == 0) {
@@ -99,16 +99,16 @@ public class Station {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public double getCoins() {
+	public float getCoins() {
 		return coins;
 	}
-	public void setCoins(double coins) {
+	public void setCoins(float coins) {
 		this.coins = coins;
 	}
-	public double getPower() {
+	public float getPower() {
 		return power;
 	}
-	public void setPower(double power) {
+	public void setPower(float power) {
 		this.power = power;
 	}
 	public double getLatitude() {

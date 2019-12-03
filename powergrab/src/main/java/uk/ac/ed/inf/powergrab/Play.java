@@ -141,8 +141,8 @@ public class Play {
 				symbol = Symbol.danger;
 			}
 			stations.add(new Station(i.getProperty("id").getAsString(),
-					i.getProperty("coins").getAsDouble(), 
-					i.getProperty("power").getAsDouble(),
+					i.getProperty("coins").getAsFloat(), 
+					i.getProperty("power").getAsFloat(),
 					symbol,
 					i.getProperty("marker-color").getAsString(),
 					((Point)i.geometry()).latitude(),

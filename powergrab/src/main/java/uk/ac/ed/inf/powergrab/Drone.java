@@ -11,8 +11,8 @@ import com.mapbox.geojson.Point;
  */
 public class Drone {
 	protected Position currentPosition;
-	protected double coins;
-    protected double power;
+	protected float coins;
+    protected float power;
     protected ArrayList<Station> stations;
     protected java.util.Random rnd;
     protected String output;
@@ -44,8 +44,8 @@ public class Drone {
      * @param coins - The number of coins of the station.
      * @return the number of change of coins of the station.
      */
-    protected double setCoins(double coins) {
-		double coinsBefore = this.coins;
+    protected float setCoins(float coins) {
+    	float coinsBefore = this.coins;
 		if (this.coins + coins <= 0) {
 			this.coins =  0;
 			return -coinsBefore;
@@ -60,8 +60,8 @@ public class Drone {
      * @param power - The number of power of the station.
      * @return the number of change of power of the station.
      */
-	protected double setPower(double power) {
-		double powerBefore = this.power;
+	protected float setPower(float power) {
+		float powerBefore = this.power;
 		if (this.power + power <= 0) {
 			this.power = 0;
 			return -powerBefore;
