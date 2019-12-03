@@ -1,6 +1,6 @@
 package uk.ac.ed.inf.powergrab;
 /**
- * An class to represent a station on the map.
+ * A class to represent a station on the map.
  * Each stations have latitude ,longitude, id, coin, power, symbol, color.
  * Coin, power and symbol can be changed when the drone passes it.
  */

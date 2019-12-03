@@ -28,6 +28,7 @@ public class Stateless extends Drone {
         while(step < 250 && next()) {
         	step++;
         }
+//        System.out.printf("%f %f ",coins,power);
 	}
 	
 	/**
@@ -35,7 +36,7 @@ public class Stateless extends Drone {
 	 * @return true if the power is not negative; false otherwise.
 	 */
 	private boolean next() {
-		if (setPower(-1.25f)!=1.25) {
+		if (setPower(-1.25f)!=1.25f) {
 			return false;
 		}
 		StringBuilder sb = new StringBuilder();
@@ -129,6 +130,8 @@ public class Stateless extends Drone {
 					maxPowerDirection.add(d);
 				}
 			}
+			//if there are more than one direction can go to the station with the max coins and power,
+			//choose one randomly
 			return maxPowerDirection.get(rnd.nextInt(maxPowerDirection.size()));
 		}
 	}
