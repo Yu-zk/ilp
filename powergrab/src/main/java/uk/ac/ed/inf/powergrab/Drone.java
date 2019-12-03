@@ -5,7 +5,8 @@ import java.util.Random;
 
 import com.mapbox.geojson.Point;
 /**
- * A super class for the stateful and steless because they have many identical feature.
+ * A class to represent a drone to store some information of the drone. Every Play can only have one Drone.
+ * The super class for the stateful and steless because they have many identical features and methods.
  *
  */
 public class Drone {
@@ -14,7 +15,7 @@ public class Drone {
     protected double power;
     protected ArrayList<Station> stations;
     protected java.util.Random rnd;
-    protected String out;
+    protected String output;
     protected ArrayList<Point> points;
     protected int step;
     
@@ -33,7 +34,7 @@ public class Drone {
 		rnd = new Random(seed);
 		this.coins = 0;
 		this.power = 250;
-		out = "";
+		output = "";
 		step = 0;
 		points = new ArrayList<Point>();
 	}
@@ -71,11 +72,42 @@ public class Drone {
 	}
 	
 	/**
+	 * Return the station can be collected from the specified position, null if there is no station
+	 * @param p - a specified position
+	 * @return the station can be collected from the specified position
+	 */
+	protected Station nearestChargableStation(Position p) {
+		double min = 0.00025;
+		Station nearestStation= null;
+		for (Station s: stations) {
+			double d=s.distance(p);
+			if (d<=min) {
+				min = d;
+				nearestStation = s;
+			}
+		}
+		return nearestStation;
+	}
+	
+	/**
+	 * Update the coins and power for both drone and station with the given station id.
+	 * @param id - id of the station
+	 */
+	protected void updateWithId(String id) {
+		for (Station s : stations) {
+			if (s.getId().equals(id)) {
+				s.update(setCoins(s.getCoins()),setPower(s.getPower()));
+				break;
+			}
+		}
+	}
+	
+	/**
 	 * Returns the movement log for the drone as string.
 	 * @return the movement log for the drone.
 	 */
 	public String getOut() {
-		return out;
+		return output;
 	}
 	
 	/**

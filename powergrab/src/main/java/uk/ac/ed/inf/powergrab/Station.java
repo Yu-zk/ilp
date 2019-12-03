@@ -54,7 +54,7 @@ public class Station {
 	
 	/**
 	 * Returns the Euclidean distance from this station to a specified position.
-	 * @param p - The specified position to be measured against this station
+	 * @param p - The specified position to be measured against this station.
 	 * @return the Euclidean distance between this station and a specified position.
 	 */
 	public double distance(Position p) {
@@ -63,10 +63,19 @@ public class Station {
 	
 	/**
 	 * Generate a position instance which has the same latitude and longitude with the station.
-	 * @return Position
+	 * @return Position which has the same latitude and longitude with the station.
 	 */
 	public Position getPosition() {
 		return new Position(latitude, longitude);
+	}
+	
+	/**
+	 * Override the toString method to make the output easier to read when debug.
+	 */
+	@Override
+	public String toString() {
+		return "Station [id=" + id + ", latitude=" + latitude + ", longitude=" + longitude + ", coins=" + coins
+				+ ", power=" + power + ", symbol=" + symbol + ", color=" + color + "]";
 	}
 	
 	/**
@@ -113,15 +122,6 @@ public class Station {
 	}
 	public void setLongitude(double longitude) {
 		this.longitude = longitude;
-	}
-
-	/**
-	 * Override the toString method to make the output easier to read when debug.
-	 */
-	@Override
-	public String toString() {
-		return "Station [id=" + id + ", latitude=" + latitude + ", longitude=" + longitude + ", coins=" + coins
-				+ ", power=" + power + ", symbol=" + symbol + ", color=" + color + "]";
 	}
 
 }

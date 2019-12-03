@@ -17,7 +17,7 @@ import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 /**
- * Download the data from the website, process them and wirte the txt and geojson file.
+ * Download the data from the website, process them and write the txt and geojson file.
  *
  */
 public class Play {
@@ -25,14 +25,13 @@ public class Play {
 	
 	/**
 	 * Constructor.
-	 * Download the geojson file with the given year, month and day and put all information into a Station ArrayList.
+	 * Download the geojson file with the specified year, month and day and put all information into a Station ArrayList.
 	 * Then, run the simulator.
 	 * Finally, write the log for each movement and geogson with the path with the specific file name.
 	 */
 	public Play(String day, String month, String year, double latitude, double longitude, int seed, String mode) {
 		ArrayList<Station> stations = buildMap(year, month, day);
-		System.out.printf("%s %s %s",year,month,day);
-		
+//		System.out.printf("%s %s %s",year,month,day);
 		if ("stateful".equals(mode)) {
 			Stateful stateful = new Stateful(latitude, longitude, seed, stations);
 			stateful.run();
@@ -44,7 +43,7 @@ public class Play {
 			wirteFile(String.format("stateless-%s-%s-%s.txt", day, month, year),stateless.getOut());
 			wirteFile(String.format("stateless-%s-%s-%s.geojson", day, month, year),toJson(stateless.getPoints()));
 		}
-		System.out.println();
+//		System.out.println();
 	}
 
 	/**

@@ -1,13 +1,19 @@
 package uk.ac.ed.inf.powergrab;
+
 /**
  * An class to represent a position on the map.
- * Each positions are identified by a latitude and a longitude.
+ * Each position are identified by a latitude and a longitude.
  *
  */
 public class Position {
 	public double latitude;
 	public double longitude;
-	
+	// Use static to ensure these values are only calculated once.
+	// This can avoid duplicated calculation in every movement.
+	public static final double sin45 = 0.0003 * Math.sin(Math.PI / 4);
+	public static final double sin225 = 0.0003 * Math.sin(Math.PI / 8);
+	public static final double cos225 = 0.0003 * Math.cos(Math.PI / 8);
+		
 	/**
 	 * Create a new position and sets the location of this position to the specified double latitude and longitude.
 	 * @param latitude - the latitude of the position
@@ -17,12 +23,6 @@ public class Position {
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
-	
-	// use static to ensure these values are only calculated once.
-	// this can avoid duplicated calculation in every movement.
-	public static final double sin45 = 0.0003 * Math.sin(Math.PI / 4);
-	public static final double sin225 = 0.0003 * Math.sin(Math.PI / 8);
-	public static final double cos225 = 0.0003 * Math.cos(Math.PI / 8);
 	
 	/**
 	 * Calculate the final position from the current position with a given direction.

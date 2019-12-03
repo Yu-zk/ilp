@@ -3,7 +3,10 @@ package uk.ac.ed.inf.powergrab;
 import java.util.ArrayList;
 import java.util.HashMap;
 import com.mapbox.geojson.Point;
-
+/**
+ * An instance of this class is used to perform a stateless simulator.
+ *
+ */
 public class Stateless extends Drone {
 	
 	/**
@@ -46,7 +49,7 @@ public class Stateless extends Drone {
 		// if the drone is close enough to a charging station after the move, 
 		// update the coins and power for both drone and station
 		if (availableStations.get(nextD)!=null) {
-			update(availableStations.get(nextD).getId());
+			updateWithId(availableStations.get(nextD).getId());
 		}
 		
 		currentPosition = currentPosition.nextPosition(nextD);
@@ -60,7 +63,7 @@ public class Stateless extends Drone {
 		sb.append(",");
 		sb.append(power);
 		sb.append("\n");
-		out = out + sb.toString();
+		output = output + sb.toString();
 		points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
 		return this.power>0;
 	}
@@ -75,60 +78,56 @@ public class Stateless extends Drone {
 		for (Direction d : Direction.values()) {
 			Position p1 = currentPosition.nextPosition(d);
 			if (p1.inPlayArea()) {
-				double minDistance = 1;
-				Station closestStation = null;
-				for (Station s : stations) {
-					double distance=s.distance(p1);
-					if (distance<0.00025&&distance<minDistance) {
-						minDistance = distance;
-						closestStation=s;
-					}
-				}
-				r.put(d, closestStation);
+				r.put(d, nearestChargableStation(p1));
 			}
-			
 		}
 		return r;
 	}
 	
 	/**
-	 * Choose a direction which can arrive in the station the maximum power, 
-	 * if there are many stations with the maximum power, choose one randomly.
+	 * Choose a direction which can arrive in the station the maximum coin.
+	 * If there are many stations with the maximum coin, 
+	 * choose the direction which can go to the station with the maximum power
+	 * If there is still more than one options, choose one randomly.
 	 * @param availableStations - a hash map which direction is the key and station is the value
 	 * @param directions - an arraylist of directions we can choose
 	 * @return the direction is chosen randomly
 	 */
 	private Direction chososeDirection(HashMap<Direction, Station> availableStations) {
-		ArrayList<Direction> maxDirection = new ArrayList<Direction>();
+		ArrayList<Direction> maxCoinDirection = new ArrayList<Direction>();
 		double max = -126;
 		for (Direction d : availableStations.keySet()) {
-			double power=0;
+			double coin=0;
 			if (availableStations.get(d) != null) {
-				power = availableStations.get(d).getPower();
+				coin = availableStations.get(d).getCoins();
 			}
-			if (power > max) {
-				max=power;
-				maxDirection.clear();
-				maxDirection.add(d);
-			}else if (power == max) {
-				maxDirection.add(d);
-			}
-		}
-		return maxDirection.get(rnd.nextInt(maxDirection.size()));
-	}
-	
-	/**
-	 * update the coins and power for both drone and station with the given station id
-	 * @param id - id of the station
-	 */
-	private void update(String id) {
-		for (Station s : stations) {
-			if (s.getId()==id) {
-				s.update(setCoins(s.getCoins()),setPower(s.getPower()));
-				break;
+			if (coin > max) {
+				max=coin;
+				maxCoinDirection.clear();
+				maxCoinDirection.add(d);
+			}else if (coin == max) {
+				maxCoinDirection.add(d);
 			}
 		}
+		if (maxCoinDirection.size()==1) {
+			//if there is only one direction can go to the station with the maximum coin
+			return maxCoinDirection.get(0);
+		}else {
+			//else choose the direction can go to the station with the maximum power
+			max = -126;
+			ArrayList<Direction> maxPowerDirection = new ArrayList<Direction>();
+			for (Direction d : maxCoinDirection) {
+				double power = availableStations.get(d).getPower();
+				if (power > max) {
+					max = power;
+					maxPowerDirection.clear();
+					maxPowerDirection.add(d);
+				}else if (power == max) {
+					maxPowerDirection.add(d);
+				}
+			}
+			return maxPowerDirection.get(rnd.nextInt(maxPowerDirection.size()));
+		}
 	}
-	
 }
 
