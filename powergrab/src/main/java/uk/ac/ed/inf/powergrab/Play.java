@@ -31,7 +31,7 @@ public class Play {
 	 */
 	public Play(String day, String month, String year, double latitude, double longitude, int seed, String mode) {
 		ArrayList<Station> stations = buildMap(year, month, day);
-//		System.out.printf("%s %s %s",year,month,day);
+//		System.out.printf("%s %s %s ",year,month,day);
 		if ("stateful".equals(mode)) {
 			Stateful stateful = new Stateful(latitude, longitude, seed, stations);
 			stateful.run();

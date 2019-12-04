@@ -15,7 +15,9 @@ public class Stateful extends Drone{
 
 	private ArrayList<Station> path;
 	private ArrayList<Station> danger;
-	private int tryTime;
+	private int maxSureStep;
+	private ArrayList<Direction> directions;
+	
 
 	/**
      * Constructor to create a new statefull drone instance by the constructor of superclass.
@@ -31,6 +33,7 @@ public class Stateful extends Drone{
 	public Stateful(double latitude, double longitude, int seed, ArrayList<Station> stations) {
 		super(latitude, longitude, seed, stations);
 		points.add(Point.fromLngLat(longitude, latitude));
+		directions = new ArrayList<Direction>();
 		// find all stations with the positive coin and power, then create a sequence of steps
 		path = new ArrayList<Station>();
 		for (Station s:stations) {
@@ -61,7 +64,6 @@ public class Stateful extends Drone{
 			}
 		};
 		Collections.sort(danger,c);
-		tryTime = 0;
 	}
 	
 	/**
@@ -114,9 +116,36 @@ public class Stateful extends Drone{
 			    //in this case, it cannot collect from the target station because it must be more closer to another station
 				randomStep();
 			}else {
-				if (tryTime<20) {
-					astar(currentPosition,target);
-				}else {
+				if (!astar(currentPosition,target)) {
+					int j = 0;
+					StringBuilder sb = new StringBuilder(); 
+					while (maxSureStep>=0 && j<3 && setPower(-1.25f)==1.25f && step<250) {
+						// repeat moving to the opposite direction with the previous move
+						sb.append(currentPosition.latitude);
+						sb.append(",");
+						sb.append(currentPosition.longitude);
+						sb.append(",");	
+						step ++;
+						Direction nextD = Direction.opposite(directions.get(maxSureStep));
+						directions.add(nextD);
+						currentPosition=currentPosition.nextPosition(nextD);
+						sb.append(nextD);
+						sb.append(",");
+						sb.append(currentPosition.latitude);
+						sb.append(",");
+						sb.append(currentPosition.longitude);
+						sb.append(",");
+						sb.append(coins);
+						sb.append(",");
+						sb.append(power);
+						sb.append("\n");
+						points.add(Point.fromLngLat(currentPosition.longitude, currentPosition.latitude));
+						maxSureStep--;
+						j++;
+					}
+					output = output + sb.toString();
+				}
+				if (maxSureStep<0){
 					//consider visiting the station with negative coins and power with the descending order of the coins
 					for (int i=0;i<danger.size();i++) {
 						if (-danger.get(i).getCoins()>target.getCoins()) {
@@ -168,6 +197,7 @@ public class Stateful extends Drone{
 			step ++;
 			currentPosition=currentPosition.nextPosition(nextD);
 			nextD = Direction.opposite(nextD);
+			directions.add(nextD);
 			sb.append(nextD);
 			sb.append(",");
 			sb.append(currentPosition.latitude);
@@ -231,6 +261,7 @@ public class Stateful extends Drone{
 		step ++;
 		ArrayList<Direction> availableDirections=availableDirection(currentPosition);
 		Direction nextD=availableDirections.get(rnd.nextInt(availableDirections.size()));
+		directions.add(nextD);
 
 		currentPosition=currentPosition.nextPosition(nextD);
 		Station nearestStation = nearestChargableStation(currentPosition);
@@ -258,8 +289,9 @@ public class Stateful extends Drone{
 	 * Find a path to from specified position to the specified target station with the a star algorithm(from wikipedia).
 	 * @param start - the start position
 	 * @param target - the target station
+	 * @return true if the a star algorithm can find a path with the threshold
 	 */
-	private void astar(Position start, Station target) {
+	private boolean astar(Position start, Station target) {
 		Position goal = target.getPosition();
 		// For node n, cameFrom[n] is the node immediately preceding it on the cheapest path from start to n currently known.
 		HashMap<Position, Position> cameFrom = new HashMap<Position, Position>();
@@ -291,10 +323,8 @@ public class Stateful extends Drone{
 		openSet.add(start);
 		
 		while (openSet.size()>0) {
-			if (openSet.size()>10000) {
-				randomStep();
-				tryTime++;
-				return;
+			if (openSet.size()>5000) {
+				return false;
 			}
 			Position current = null;
 			current=openSet.poll();
@@ -305,8 +335,8 @@ public class Stateful extends Drone{
 			if (nearestChargableStation(current)==target) {//in range
 				path.remove(target);
 				reconstruct_path(cameFrom, cameDirection, current, target.getId());
-				tryTime=0;
-				return;
+				maxSureStep = directions.size()-1;
+				return true;
 			}
 			
 			for (Direction d : availableDirection(current)) {
@@ -328,6 +358,7 @@ public class Stateful extends Drone{
 				}
 			}
 		}
+		return false;
 	}
 	
 	/**
@@ -342,9 +373,9 @@ public class Stateful extends Drone{
 		path.add(current);
 		
 		while (cameFrom.keySet().contains(current)) {
+			directionPath.add(cameDirection.get(current));
 			current=cameFrom.get(current);
 			path.add(current);
-			directionPath.add(cameDirection.get(current));
 		}
 		Collections.reverse(path);
 		Collections.reverse(directionPath);
@@ -367,6 +398,7 @@ public class Stateful extends Drone{
 					break;
 				}
 			}
+			directions.add(directionPath.get(i-1));
 			sb.append(directionPath.get(i-1));
 			sb.append(",");
 			sb.append(path.get(i).latitude);
