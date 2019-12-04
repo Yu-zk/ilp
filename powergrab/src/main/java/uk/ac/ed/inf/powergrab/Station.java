@@ -5,13 +5,13 @@ package uk.ac.ed.inf.powergrab;
  * Coin, power and symbol can be changed when the drone passes it.
  */
 public class Station {
-	private String id;
-	private double latitude;
-	private double longitude;
+	public final String id;
+	public final double latitude;
+	public final double longitude;
     private float coins;
     private float power;
     private Symbol symbol;
-    private String color;
+    public final String color;
     
 	
 	/**
@@ -87,18 +87,6 @@ public class Station {
 	public void setSymbol(Symbol symbol) {
 		this.symbol = symbol;
 	}
-	public String getColor() {
-		return color;
-	}
-	public void setColor(String color) {
-		this.color = color;
-	}
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
 	public float getCoins() {
 		return coins;
 	}
@@ -111,17 +99,4 @@ public class Station {
 	public void setPower(float power) {
 		this.power = power;
 	}
-	public double getLatitude() {
-		return latitude;
-	}
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-	public double getLongitude() {
-		return longitude;
-	}
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
-
 }

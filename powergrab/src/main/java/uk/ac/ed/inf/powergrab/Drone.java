@@ -95,7 +95,7 @@ public class Drone {
 	 */
 	protected void updateWithId(String id) {
 		for (Station s : stations) {
-			if (s.getId().equals(id)) {
+			if (s.id.equals(id)) {
 				s.update(setCoins(s.getCoins()),setPower(s.getPower()));
 				break;
 			}

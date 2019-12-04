@@ -50,7 +50,7 @@ public class Stateless extends Drone {
 		// if the drone is close enough to a charging station after the move, 
 		// update the coins and power for both drone and station
 		if (availableStations.get(nextD)!=null) {
-			updateWithId(availableStations.get(nextD).getId());
+			updateWithId(availableStations.get(nextD).id);
 		}
 		
 		currentPosition = currentPosition.nextPosition(nextD);

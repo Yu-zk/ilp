@@ -334,7 +334,7 @@ public class Stateful extends Drone{
 
 			if (nearestChargableStation(current)==target) {//in range
 				path.remove(target);
-				reconstruct_path(cameFrom, cameDirection, current, target.getId());
+				reconstruct_path(cameFrom, cameDirection, current, target.id);
 				maxSureStep = directions.size()-1;
 				return true;
 			}
