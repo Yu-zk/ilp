@@ -1,6 +1,4 @@
 /target/
-/dronetype-15-09-2019.geojson
-/dronetype-15-09-2019.txt
 *.txt
 *.geojson
 *.ucls
