@@ -23,7 +23,7 @@ public class App
 	
 	/**
 	 * Run all the days in 2 years with the given latitude, longitude, seed and mode. Print the runtime for every day.
-	 * @param from the input
+	 * @param latitude, longitude, seed and mode from the input
 	 */
 	public static void test(double latitude, double longitude, int seed, String mode) {
 		int[] years = {2019,2020};

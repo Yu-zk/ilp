@@ -86,10 +86,10 @@ public class Stateless extends Drone {
 	}
 	
 	/**
-	 * Choose a direction which can arrive in the station the maximum coin.
+	 * Choose a direction which can arrive in the station with the maximum coin.
 	 * If there are many stations with the maximum coin, 
 	 * choose the direction which can go to the station with the maximum power
-	 * If there is still more than one options, choose one randomly.
+	 * If there are still more than one options, choose one randomly.
 	 * @param availableStations - a hash map which direction is the key and station is the value
 	 * @param directions - an arraylist of directions we can choose
 	 * @return the direction is chosen randomly

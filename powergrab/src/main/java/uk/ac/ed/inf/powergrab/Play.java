@@ -26,8 +26,8 @@ public class Play {
 	/**
 	 * Constructor.
 	 * Download the geojson file with the specified year, month and day and put all information into a Station ArrayList.
-	 * Then, run the simulator.
-	 * Finally, write the log for each movement and geogson with the path with the specific file name.
+	 * Then, create an instance Stateless or Stateful depends on the input mode.
+	 * Finally, write the log for each movement and geojson with the path with the specific file name.
 	 */
 	public Play(String day, String month, String year, double latitude, double longitude, int seed, String mode) {
 		ArrayList<Station> stations = buildMap(year, month, day);
@@ -35,12 +35,12 @@ public class Play {
 		if ("stateful".equals(mode)) {
 			Stateful stateful = new Stateful(latitude, longitude, seed, stations);
 			stateful.run();
-			wirteFile(String.format("stateful-%s-%s-%s.txt", day, month, year),stateful.getOut());
+			wirteFile(String.format("stateful-%s-%s-%s.txt", day, month, year),stateful.getOutput());
 			wirteFile(String.format("stateful-%s-%s-%s.geojson", day, month, year),toJson(stateful.getPoints()));
 		}else {
 			Stateless stateless = new Stateless(latitude, longitude, seed, stations);
 			stateless.run();
-			wirteFile(String.format("stateless-%s-%s-%s.txt", day, month, year),stateless.getOut());
+			wirteFile(String.format("stateless-%s-%s-%s.txt", day, month, year),stateless.getOutput());
 			wirteFile(String.format("stateless-%s-%s-%s.geojson", day, month, year),toJson(stateless.getPoints()));
 		}
 //		System.out.println();

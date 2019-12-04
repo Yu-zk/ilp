@@ -72,7 +72,7 @@ public class Drone {
 	}
 	
 	/**
-	 * Return the station can be collected from the specified position, null if there is no station
+	 * Return the station can be collected from the specified position, null if there is no such station
 	 * @param p - a specified position
 	 * @return the station can be collected from the specified position
 	 */
@@ -106,7 +106,7 @@ public class Drone {
 	 * Returns the movement log for the drone as string.
 	 * @return the movement log for the drone.
 	 */
-	public String getOut() {
+	public String getOutput() {
 		return output;
 	}
 	

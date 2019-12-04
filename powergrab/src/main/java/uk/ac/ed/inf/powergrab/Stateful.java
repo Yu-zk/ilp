@@ -94,13 +94,13 @@ public class Stateful extends Drone{
 			}
 			sorted.add(nextS);
 			original.remove(nextS);
-			p=nextS.getPosition();
+			p=nextS.toPosition();
 		}
 		return sorted;
 	}
 	
 	/**
-	 * Make a move. Go to the next station with positive coin and power,
+	 * Make a move. Go to the next station in the arraylist path,
 	 * use method waste() to make moves after visiting all stations with positive coin and power.
 	 * @return true if the power is not negative; false otherwise.
 	 */
@@ -174,7 +174,7 @@ public class Stateful extends Drone{
 	}
 
 	/**
-	 * Find a direction which is not within the dangerous station and in the play area,
+	 * Find a direction from the current position which will not result in reaching the dangerous station and in the play area,
 	 * move with this direction and then return.
 	 * Repeat these 2 steps until 250 moves or no more power.
 	 */
@@ -286,13 +286,13 @@ public class Stateful extends Drone{
 	}
 
 	/**
-	 * Find a path to from specified position to the specified target station with the a star algorithm(from wikipedia).
+	 * Find a path from specified position to the specified target station with the a star algorithm(from wikipedia).
 	 * @param start - the start position
 	 * @param target - the target station
 	 * @return true if the a star algorithm can find a path with the threshold
 	 */
 	private boolean astar(Position start, Station target) {
-		Position goal = target.getPosition();
+		Position goal = target.toPosition();
 		// For node n, cameFrom[n] is the node immediately preceding it on the cheapest path from start to n currently known.
 		HashMap<Position, Position> cameFrom = new HashMap<Position, Position>();
 		HashMap<Position, Direction> cameDirection = new HashMap<Position, Direction>();

@@ -1,10 +1,11 @@
 package uk.ac.ed.inf.powergrab;
 /**
  * A class to represent a station on the map.
- * Each stations have latitude ,longitude, id, coin, power, symbol, color.
+ * Each station has latitude ,longitude, id, coin, power, symbol, color.
  * Coin, power and symbol can be changed when the drone passes it.
  */
 public class Station {
+	//public final because there will never be changed
 	public final String id;
 	public final double latitude;
 	public final double longitude;
@@ -65,7 +66,7 @@ public class Station {
 	 * Generate a position instance which has the same latitude and longitude with the station.
 	 * @return Position which has the same latitude and longitude with the station.
 	 */
-	public Position getPosition() {
+	public Position toPosition() {
 		return new Position(latitude, longitude);
 	}
 	

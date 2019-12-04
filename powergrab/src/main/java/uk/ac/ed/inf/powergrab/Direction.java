@@ -1,7 +1,7 @@
 package uk.ac.ed.inf.powergrab;
 
 /**
- * A enum class to represent all 16 possible directions.
+ * An enum class to represent all 16 possible directions.
  *
  */
 public enum Direction {

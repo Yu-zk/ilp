@@ -1,8 +1,8 @@
 package uk.ac.ed.inf.powergrab;
 
 /**
- * An class to represent a position on the map.
- * Each position are identified by a latitude and a longitude.
+ * A class to represent a position on the map.
+ * Each position is identified by a latitude and a longitude.
  *
  */
 public class Position {
