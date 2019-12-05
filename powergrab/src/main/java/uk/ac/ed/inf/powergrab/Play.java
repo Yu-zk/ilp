@@ -90,7 +90,7 @@ public class Play {
 		String mapString = String.format(
 				"http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson",
 				year, month, day);
-		String mapSource="";
+		String mapSource = "";
 		try {
 			HttpURLConnection conn = (HttpURLConnection) new URL(mapString).openConnection();
 			conn.setReadTimeout(10000); 

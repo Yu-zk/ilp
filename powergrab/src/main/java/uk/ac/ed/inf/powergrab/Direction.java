@@ -22,7 +22,7 @@ public enum Direction {
 	 * @return the opposite direction with the given direction
 	 */
 	public static Direction opposite(Direction d) {
-		if (d==null) {
+		if (d == null) {
 			return null;
 		}
 		switch (d) {

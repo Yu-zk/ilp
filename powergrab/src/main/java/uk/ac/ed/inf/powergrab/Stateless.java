@@ -36,7 +36,7 @@ public class Stateless extends Drone {
 	 * @return true if the power is not negative; false otherwise.
 	 */
 	private boolean next() {
-		if (setPower(-1.25f)!=1.25f) {
+		if (setPower(-1.25f) != 1.25f) {
 			return false;
 		}
 		StringBuilder sb = new StringBuilder();
@@ -98,7 +98,7 @@ public class Stateless extends Drone {
 		ArrayList<Direction> maxCoinDirection = new ArrayList<Direction>();
 		double max = -126;
 		for (Direction d : availableStations.keySet()) {
-			double coin=0;
+			double coin = 0;
 			if (availableStations.get(d) != null) {
 				coin = availableStations.get(d).getCoins();
 			}
@@ -110,7 +110,7 @@ public class Stateless extends Drone {
 				maxCoinDirection.add(d);
 			}
 		}
-		if (maxCoinDirection.size()==1) {
+		if (maxCoinDirection.size() == 1) {
 			//if there is only one direction can go to the station with the maximum coin
 			return maxCoinDirection.get(0);
 		}else {
@@ -118,7 +118,7 @@ public class Stateless extends Drone {
 			max = -126;
 			ArrayList<Direction> maxPowerDirection = new ArrayList<Direction>();
 			for (Direction d : maxCoinDirection) {
-				double power=0;
+				double power = 0;
 				if (availableStations.get(d) != null) {
 					power = availableStations.get(d).getPower();
 				}

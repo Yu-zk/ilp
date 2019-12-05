@@ -80,8 +80,8 @@ public class Drone {
 		double min = 0.00025;
 		Station nearestStation= null;
 		for (Station s: stations) {
-			double d=s.distance(p);
-			if (d<=min) {
+			double d = s.distance(p);
+			if (d <= min) {
 				min = d;
 				nearestStation = s;
 			}
